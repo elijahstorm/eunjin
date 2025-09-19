@@ -1,0 +1,207 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "email": "alice.kim@example.com",
+      "name": "Alice Kim",
+      "created_at": "2024-06-01T08:30:00.000Z"
+    },
+    {
+      "id": "user-2",
+      "email": "bob.lee@example.com",
+      "name": "Bob Lee",
+      "created_at": "2024-06-01T09:15:00.000Z"
+    },
+    {
+      "id": "user-3",
+      "email": "charlie.park@example.com",
+      "name": "Charlie Park",
+      "created_at": "2024-06-01T10:00:00.000Z"
+    },
+    {
+      "id": "user-4",
+      "email": "dana.choi@example.com",
+      "name": "Dana Choi",
+      "created_at": "2024-06-01T10:45:00.000Z"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-1",
+      "name": "EduTech Corp",
+      "created_at": "2024-05-20T07:00:00.000Z"
+    },
+    {
+      "id": "org-2",
+      "name": "BizMeet Solutions",
+      "created_at": "2024-05-22T07:30:00.000Z"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "session-1",
+      "organization_id": "org-1",
+      "title": "2024 AI Seminar",
+      "start_time": "2024-06-10T14:00:00.000Z",
+      "end_time": "2024-06-10T15:30:00.000Z",
+      "created_by": "user-1"
+    },
+    {
+      "id": "session-2",
+      "organization_id": "org-2",
+      "title": "Quarterly Business Review",
+      "start_time": "2024-06-11T09:00:00.000Z",
+      "end_time": "2024-06-11T11:00:00.000Z",
+      "created_by": "user-2"
+    },
+    {
+      "id": "session-3",
+      "organization_id": "org-1",
+      "title": "Faculty Meeting",
+      "start_time": "2024-06-12T13:00:00.000Z",
+      "end_time": "2024-06-12T14:00:00.000Z",
+      "created_by": "user-3"
+    }
+  ],
+  "recordings": [
+    {
+      "id": "rec-1",
+      "session_id": "session-1",
+      "user_id": "user-1",
+      "file_path": "recordings/session-1/rec1.mp3",
+      "duration_seconds": 5400,
+      "created_at": "2024-06-10T15:31:00.000Z"
+    },
+    {
+      "id": "rec-2",
+      "session_id": "session-2",
+      "user_id": "user-2",
+      "file_path": "recordings/session-2/rec2.mp3",
+      "duration_seconds": 7200,
+      "created_at": "2024-06-11T11:01:00.000Z"
+    },
+    {
+      "id": "rec-3",
+      "session_id": "session-3",
+      "user_id": "user-3",
+      "file_path": "recordings/session-3/rec3.mp3",
+      "duration_seconds": 3600,
+      "created_at": "2024-06-12T14:01:00.000Z"
+    }
+  ],
+  "transcripts": [
+    {
+      "id": "trans-1",
+      "recording_id": "rec-1",
+      "speaker_id": "sp-1",
+      "start_time": "2024-06-10T14:00:00.000Z",
+      "end_time": "2024-06-10T14:05:00.000Z",
+      "text": "안녕하세요, 오늘 AI 세미나에 오신 것을 환영합니다."
+    },
+    {
+      "id": "trans-2",
+      "recording_id": "rec-1",
+      "speaker_id": "sp-2",
+      "start_time": "2024-06-10T14:05:00.000Z",
+      "end_time": "2024-06-10T14:10:00.000Z",
+      "text": "오늘 저는 최신 기계 학습 동향에 대해 말씀드리겠습니다."
+    },
+    {
+      "id": "trans-3",
+      "recording_id": "rec-2",
+      "speaker_id": "sp-3",
+      "start_time": "2024-06-11T09:00:00.000Z",
+      "end_time": "2024-06-11T09:15:00.000Z",
+      "text": "이번 분기 성과 보고서입니다."
+    },
+    {
+      "id": "trans-4",
+      "recording_id": "rec-3",
+      "speaker_id": "sp-4",
+      "start_time": "2024-06-12T13:00:00.000Z",
+      "end_time": "2024-06-12T13:10:00.000Z",
+      "text": "교수님들, 이번 학기 학사 일정에 대해 논의하겠습니다."
+    }
+  ],
+  "speakers": [
+    {
+      "id": "sp-1",
+      "session_id": "session-1",
+      "name": "Professor Kim"
+    },
+    {
+      "id": "sp-2",
+      "session_id": "session-1",
+      "name": "Dr. Lee"
+    },
+    {
+      "id": "sp-3",
+      "session_id": "session-2",
+      "name": "Manager Choi"
+    },
+    {
+      "id": "sp-4",
+      "session_id": "session-3",
+      "name": "Dean Park"
+    }
+  ],
+  "highlights": [
+    {
+      "id": "hl-1",
+      "session_id": "session-1",
+      "user_id": "user-1",
+      "timestamp": "2024-06-10T14:02:30.000Z",
+      "content": "AI의 미래 전망에 대한 중요 발언"
+    },
+    {
+      "id": "hl-2",
+      "session_id": "session-1",
+      "user_id": "user-2",
+      "timestamp": "2024-06-10T14:07:10.000Z",
+      "content": "기계 학습 모델 평가 방법 설명"
+    },
+    {
+      "id": "hl-3",
+      "session_id": "session-2",
+      "user_id": "user-2",
+      "timestamp": "2024-06-11T09:05:00.000Z",
+      "content": "매출 증가 전략 요약"
+    },
+    {
+      "id": "hl-4",
+      "session_id": "session-3",
+      "user_id": "user-3",
+      "timestamp": "2024-06-12T13:05:00.000Z",
+      "content": "학사 일정 변경 사항 안내"
+    }
+  ],
+  "summaries": [
+    {
+      "id": "sum-1",
+      "session_id": "session-1",
+      "generated_at": "2024-06-10T16:00:00.000Z",
+      "full_transcript": "전체 AI 세미나 전사본 포함 타임스탬프 및 화자 표기",
+      "highlight_summary": "중요 발언 및 기계 학습 모델 평가 방법 요약본"
+    },
+    {
+      "id": "sum-2",
+      "session_id": "session-2",
+      "generated_at": "2024-06-11T12:00:00.000Z",
+      "full_transcript": "분기 사업 검토 전사 및 타임스탬프 포함",
+      "highlight_summary": "매출 증가 전략과 핵심 내용 요약"
+    },
+    {
+      "id": "sum-3",
+      "session_id": "session-3",
+      "generated_at": "2024-06-12T15:00:00.000Z",
+      "full_transcript": "교수진 미팅 전체 전사 내용",
+      "highlight_summary": "학사 일정 변경 및 주요 안내 내용 요약"
+    }
+  ],
+  "session": {
+    "user": {
+      "id": "user-1",
+      "email": "alice.kim@example.com"
+    }
+  }
+}
