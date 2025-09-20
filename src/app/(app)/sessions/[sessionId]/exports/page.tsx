@@ -519,19 +519,19 @@ export default function Page() {
       <nav className="mb-6 text-sm text-muted-foreground">
         <ul className="flex flex-wrap items-center gap-2">
           <li>
-            <Link className="hover:text-foreground" href="/src/app/(app)/dashboard" prefetch>
+            <Link className="hover:text-foreground" href="/dashboard" prefetch>
               /dashboard
             </Link>
           </li>
           <li>/</li>
           <li>
-            <Link className="hover:text-foreground" href="/src/app/(app)/sessions" prefetch>
+            <Link className="hover:text-foreground" href="/sessions" prefetch>
               /sessions
             </Link>
           </li>
           <li>/</li>
           <li>
-            <Link className="hover:text-foreground" href={`/src/app/(app)/sessions/${sessionId}`} prefetch>
+            <Link className="hover:text-foreground" href={`/sessions/${sessionId}`} prefetch>
               /{sessionId}
             </Link>
           </li>
@@ -546,16 +546,16 @@ export default function Page() {
           <p className="text-sm text-muted-foreground">세션 {sessionId}의 전사 및 요약을 내보내고, 공개 공유 링크를 관리하세요.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Link href={`/src/app/(app)/sessions/${sessionId}/transcript`} className="rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground" prefetch>
+          <Link href={`/sessions/${sessionId}/transcript`} className="rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground" prefetch>
             전사 보기
           </Link>
-          <Link href={`/src/app/(app)/sessions/${sessionId}/summary`} className="rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground" prefetch>
+          <Link href={`/sessions/${sessionId}/summary`} className="rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground" prefetch>
             요약 보기
           </Link>
-          <Link href={`/src/app/(app)/sessions/${sessionId}/highlights`} className="rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground" prefetch>
+          <Link href={`/sessions/${sessionId}/highlights`} className="rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground" prefetch>
             하이라이트
           </Link>
-          <Link href={`/src/app/(app)/sessions/${sessionId}/settings`} className="rounded-md bg-secondary px-3 py-2 text-sm text-secondary-foreground hover:opacity-90" prefetch>
+          <Link href={`/sessions/${sessionId}/settings`} className="rounded-md bg-secondary px-3 py-2 text-sm text-secondary-foreground hover:opacity-90" prefetch>
             세션 설정
           </Link>
         </div>
@@ -565,11 +565,11 @@ export default function Page() {
         <AlertTitle>내보내기 안내</AlertTitle>
         <AlertDescription>
           - 전사/요약 내용은 이 브라우저에 저장된 텍스트를 기준으로 파일을 생성합니다. 전사 또는 요약이 비어있다면
-          <Link href={`/src/app/(app)/sessions/${sessionId}/transcript`} className="mx-1 underline" prefetch>
+          <Link href={`/sessions/${sessionId}/transcript`} className="mx-1 underline" prefetch>
             전사 페이지
           </Link>
           또는
-          <Link href={`/src/app/(app)/sessions/${sessionId}/summary`} className="mx-1 underline" prefetch>
+          <Link href={`/sessions/${sessionId}/summary`} className="mx-1 underline" prefetch>
             요약 페이지
           </Link>
           에서 내용을 준비하세요. 또한 필요 시 아래 입력창에 직접 붙여넣을 수 있습니다.
@@ -594,7 +594,7 @@ export default function Page() {
                 클립보드에서 붙여넣기
               </button>
               <Link
-                href={`/src/app/(app)/sessions/${sessionId}/transcript`}
+                href={`/sessions/${sessionId}/transcript`}
                 className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90"
                 prefetch
               >
@@ -718,7 +718,7 @@ export default function Page() {
                 클립보드에서 붙여넣기
               </button>
               <Link
-                href={`/src/app/(app)/sessions/${sessionId}/summary`}
+                href={`/sessions/${sessionId}/summary`}
                 className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90"
                 prefetch
               >
@@ -917,13 +917,13 @@ export default function Page() {
       <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
         <h3 className="mb-2 text-sm font-medium">다음 단계</h3>
         <div className="flex flex-wrap gap-2 text-sm">
-          <Link href={`/src/app/(app)/ingest/upload`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
+          <Link href={`/ingest/upload`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
             녹음 업로드
           </Link>
-          <Link href={`/src/app/(app)/integrations/zoom`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
+          <Link href={`/integrations/zoom`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
             Zoom 연동
           </Link>
-          <Link href={`/src/app/(app)/integrations/teams`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
+          <Link href={`/integrations/teams`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
             Teams 연동
           </Link>
           <Link href={`/src/app/legal/privacy`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
@@ -932,7 +932,7 @@ export default function Page() {
           <Link href={`/src/app/legal/terms`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
             이용약관
           </Link>
-          <Link href={`/src/app/(app)/org/retention`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
+          <Link href={`/org/retention`} className="rounded-md border border-input bg-background px-3 py-2 hover:bg-accent hover:text-accent-foreground" prefetch>
             보존 기간 정책
           </Link>
         </div>

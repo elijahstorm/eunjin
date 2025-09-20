@@ -53,8 +53,8 @@ export default function Page() {
     if (checking) return [] as { href: string; label: string }[];
     if (isAuthed) {
       return [
-        { href: "/(app)/sessions/new", label: "새 세션 시작하기" },
-        { href: "/(app)/dashboard", label: "대시보드" },
+        { href: "/sessions/new", label: "새 세션 시작하기" },
+        { href: "/dashboard", label: "대시보드" },
       ];
     }
     return [
@@ -94,7 +94,7 @@ export default function Page() {
                   ))
                 )}
                 <Link
-                  href="/(app)/sessions"
+                  href="/sessions"
                   className="inline-flex items-center justify-center rounded-md border border-input bg-background px-5 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   세션 목록 보기
@@ -128,8 +128,8 @@ export default function Page() {
                   <FeatureItem title="요약 자동 생성" desc="전체 전사와 중요 포인트 기반 압축 요약" />
                 </div>
                 <div className="mt-5 flex gap-2">
-                  <Link href="/(app)/sessions/new" className="inline-flex w-full items-center justify-center rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/90">새 세션</Link>
-                  <Link href="/(app)/ingest/upload" className="inline-flex w-full items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">녹음 업로드</Link>
+                  <Link href="/sessions/new" className="inline-flex w-full items-center justify-center rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/90">새 세션</Link>
+                  <Link href="/ingest/upload" className="inline-flex w-full items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">녹음 업로드</Link>
                 </div>
               </div>
             </div>
@@ -145,7 +145,7 @@ export default function Page() {
             }
             title="실시간 전사"
             desc="문장 구분과 구두점 복원으로 읽기 쉬운 라이브 스크립트 제공"
-            links={[{ href: "/(app)/sessions/new", label: "바로 전사 시작" }, { href: "/(app)/sessions", label: "기록 보기" }]}
+            links={[{ href: "/sessions/new", label: "바로 전사 시작" }, { href: "/sessions", label: "기록 보기" }]}
           />
           <LandingCard
             icon={
@@ -153,7 +153,7 @@ export default function Page() {
             }
             title="하이라이트 수집"
             desc="버튼/메모로 바로 표시하고, 타임스탬프 포함 텍스트 업로드도 지원"
-            links={[{ href: "/(app)/sessions/new", label: "세션에서 표시" }, { href: "/(app)/ingest/upload", label: "하이라이트 업로드" }]}
+            links={[{ href: "/sessions/new", label: "세션에서 표시" }, { href: "/ingest/upload", label: "하이라이트 업로드" }]}
           />
           <LandingCard
             icon={
@@ -161,7 +161,7 @@ export default function Page() {
             }
             title="요약/내보내기"
             desc="전체 전사본과 핵심 요약본을 PDF/TXT로 저장하고 링크로 공유"
-            links={[{ href: "/(app)/dashboard", label: "대시보드 보기" }, { href: "/(app)/sessions", label: "세션 선택" }]}
+            links={[{ href: "/dashboard", label: "대시보드 보기" }, { href: "/sessions", label: "세션 선택" }]}
           />
         </div>
       </section>
@@ -174,8 +174,8 @@ export default function Page() {
               <p className="text-sm text-muted-foreground mt-1">시작부터 공유까지, 네 단계로 끝나는 워크플로우</p>
             </div>
             <div className="hidden md:flex gap-2">
-              <Link href="/(app)/onboarding" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">온보딩</Link>
-              <Link href="/(app)/imports" className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">파일 가져오기</Link>
+              <Link href="/onboarding" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">온보딩</Link>
+              <Link href="/imports" className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">파일 가져오기</Link>
             </div>
           </div>
 
@@ -187,7 +187,7 @@ export default function Page() {
                     step="01"
                     title="세션 시작"
                     desc="브라우저에서 바로 녹음/전사를 시작합니다."
-                    cta={{ href: "/(app)/sessions/new", label: "새 세션" }}
+                    cta={{ href: "/sessions/new", label: "새 세션" }}
                   />
                 </CarouselItem>
                 <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3">
@@ -195,7 +195,7 @@ export default function Page() {
                     step="02"
                     title="하이라이트 표시"
                     desc="중요 순간에 버튼을 눌러 타임스탬프를 저장하세요."
-                    cta={{ href: "/(app)/sessions", label: "세션 열기" }}
+                    cta={{ href: "/sessions", label: "세션 열기" }}
                   />
                 </CarouselItem>
                 <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3">
@@ -203,7 +203,7 @@ export default function Page() {
                     step="03"
                     title="자동 요약"
                     desc="전체 전사와 하이라이트를 기반으로 요약본이 생성됩니다."
-                    cta={{ href: "/(app)/dashboard", label: "결과 확인" }}
+                    cta={{ href: "/dashboard", label: "결과 확인" }}
                   />
                 </CarouselItem>
                 <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3">
@@ -211,7 +211,7 @@ export default function Page() {
                     step="04"
                     title="내보내기/공유"
                     desc="PDF/TXT 다운로드와 공유용 링크를 제공합니다."
-                    cta={{ href: "/(app)/sessions", label: "내보내기" }}
+                    cta={{ href: "/sessions", label: "내보내기" }}
                   />
                 </CarouselItem>
               </CarouselContent>
@@ -228,20 +228,20 @@ export default function Page() {
             <h3 className="text-xl font-semibold">통합 및 가져오기</h3>
             <p className="mt-1 text-sm text-muted-foreground">Zoom/Teams 계정을 연동하거나, 기존 녹음 파일을 업로드하여 처리할 수 있습니다.</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Link href="/(app)/integrations/zoom" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">Zoom 연동</Link>
-              <Link href="/(app)/integrations/teams" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">Teams 연동</Link>
-              <Link href="/(app)/ingest/upload" className="inline-flex items-center rounded-md bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground hover:bg-secondary/90">녹음 업로드</Link>
-              <Link href="/(app)/imports" className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">외부 가져오기</Link>
+              <Link href="/integrations/zoom" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">Zoom 연동</Link>
+              <Link href="/integrations/teams" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">Teams 연동</Link>
+              <Link href="/ingest/upload" className="inline-flex items-center rounded-md bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground hover:bg-secondary/90">녹음 업로드</Link>
+              <Link href="/imports" className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">외부 가져오기</Link>
             </div>
           </div>
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
             <h3 className="text-xl font-semibold">보안과 동의 관리</h3>
             <p className="mt-1 text-sm text-muted-foreground">조직 보안 정책과 데이터 보존 기간을 설정하고, 참여자 동의 기록을 관리합니다.</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Link href="/(app)/consent/new" className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">동의 받기</Link>
-              <Link href="/(app)/org/security" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">보안 설정</Link>
-              <Link href="/(app)/org/retention" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">보존 정책</Link>
-              <Link href="/(app)/org/settings" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">조직 설정</Link>
+              <Link href="/consent/new" className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">동의 받기</Link>
+              <Link href="/org/security" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">보안 설정</Link>
+              <Link href="/org/retention" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">보존 정책</Link>
+              <Link href="/org/settings" className="inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground">조직 설정</Link>
             </div>
           </div>
         </div>
@@ -282,8 +282,8 @@ export default function Page() {
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             {isAuthed ? (
               <>
-                <Link href="/(app)/sessions/new" className="inline-flex items-center rounded-md bg-background px-5 py-2.5 text-sm font-medium text-foreground hover:bg-background/90">새 세션 시작</Link>
-                <Link href="/(app)/dashboard" className="inline-flex items-center rounded-md border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium hover:bg-primary-foreground/10">대시보드</Link>
+                <Link href="/sessions/new" className="inline-flex items-center rounded-md bg-background px-5 py-2.5 text-sm font-medium text-foreground hover:bg-background/90">새 세션 시작</Link>
+                <Link href="/dashboard" className="inline-flex items-center rounded-md border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium hover:bg-primary-foreground/10">대시보드</Link>
               </>
             ) : (
               <>

@@ -53,7 +53,7 @@ export default function ZoomLinkedPage() {
     external?: boolean;
   }> = [
     {
-      href: "/(app)/ingest",
+      href: "/ingest",
       label: "Ingest Center",
       description: "Start or schedule processing for new recordings.",
       accent: "from-primary/20 via-primary/10 to-transparent",
@@ -64,7 +64,7 @@ export default function ZoomLinkedPage() {
       ),
     },
     {
-      href: "/(app)/imports",
+      href: "/imports",
       label: "View Imports",
       description: "Manage Zoom cloud imports, monitor progress, and resolve issues.",
       accent: "from-chart-2/20 via-chart-2/10 to-transparent",
@@ -75,7 +75,7 @@ export default function ZoomLinkedPage() {
       ),
     },
     {
-      href: "/(app)/ingest/upload",
+      href: "/ingest/upload",
       label: "Upload Recording",
       description: "Upload local audio/video for transcription and summary.",
       accent: "from-chart-5/20 via-chart-5/10 to-transparent",
@@ -86,7 +86,7 @@ export default function ZoomLinkedPage() {
       ),
     },
     {
-      href: "/(app)/sessions/new",
+      href: "/sessions/new",
       label: "New Live Session",
       description: "Create a session and capture highlights in real time.",
       accent: "from-secondary/30 via-secondary/10 to-transparent",
@@ -99,17 +99,17 @@ export default function ZoomLinkedPage() {
   ];
 
   const secondaryLinks: Array<{ href: string; label: string }>= [
-    { href: "/(app)/integrations", label: "Manage integrations" },
-    { href: "/(app)/integrations/zoom", label: "Zoom integration settings" },
-    { href: "/(app)/integrations/teams", label: "Link Microsoft Teams" },
-    { href: "/(app)/sessions", label: "All sessions" },
-    { href: "/(app)/dashboard", label: "Dashboard" },
+    { href: "/integrations", label: "Manage integrations" },
+    { href: "/integrations/zoom", label: "Zoom integration settings" },
+    { href: "/integrations/teams", label: "Link Microsoft Teams" },
+    { href: "/sessions", label: "All sessions" },
+    { href: "/dashboard", label: "Dashboard" },
     { href: "/help", label: "Help Center" },
-    { href: "/(app)/org/settings", label: "Organization settings" },
-    { href: "/(app)/org/retention", label: "Retention policy" },
-    { href: "/(app)/org/security", label: "Security & access" },
-    { href: "/(app)/consent", label: "Consent records" },
-    { href: "/(app)/consent/new", label: "New consent" },
+    { href: "/org/settings", label: "Organization settings" },
+    { href: "/org/retention", label: "Retention policy" },
+    { href: "/org/security", label: "Security & access" },
+    { href: "/consent", label: "Consent records" },
+    { href: "/consent/new", label: "New consent" },
   ];
 
   return (
@@ -152,7 +152,7 @@ export default function ZoomLinkedPage() {
                     </span>
                   )}
                   <Link
-                    href="/(app)/integrations/zoom"
+                    href="/integrations/zoom"
                     className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                   >
                     Manage Zoom settings
@@ -184,7 +184,7 @@ export default function ZoomLinkedPage() {
       <section aria-labelledby="next-steps-heading" className="space-y-6">
         <div className="flex items-end justify-between gap-2">
           <h2 id="next-steps-heading" className="text-lg font-medium text-foreground">Next steps</h2>
-          <Link href="/(app)/imports" className="text-sm text-primary hover:underline">Go to Imports</Link>
+          <Link href="/imports" className="text-sm text-primary hover:underline">Go to Imports</Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {actions.map((a) => (
@@ -241,8 +241,8 @@ export default function ZoomLinkedPage() {
                 <li>Manage retention and security in Organization settings. Ensure consent is recorded for participants.</li>
               </ul>
               <div className="flex flex-wrap gap-2">
-                <Link href="/(app)/sessions" className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:opacity-90">View Sessions</Link>
-                <Link href="/(app)/consent/new" className="rounded-md border border-input bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted">Create Consent</Link>
+                <Link href="/sessions" className="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:opacity-90">View Sessions</Link>
+                <Link href="/consent/new" className="rounded-md border border-input bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted">Create Consent</Link>
                 <Link href="/help" className="rounded-md border border-input bg-background px-3 py-1.5 text-sm text-foreground hover:bg-muted">Help Center</Link>
               </div>
             </div>
@@ -254,11 +254,11 @@ export default function ZoomLinkedPage() {
         <p className="text-xs text-muted-foreground">
           Need to unlink Zoom? Visit
           {" "}
-          <Link href="/(app)/integrations/zoom" className="text-primary hover:underline">Zoom Integration</Link>
+          <Link href="/integrations/zoom" className="text-primary hover:underline">Zoom Integration</Link>
           {" "}
           or manage all providers in
           {" "}
-          <Link href="/(app)/integrations" className="text-primary hover:underline">Integrations</Link>.
+          <Link href="/integrations" className="text-primary hover:underline">Integrations</Link>.
         </p>
       </footer>
     </main>

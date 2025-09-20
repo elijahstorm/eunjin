@@ -57,8 +57,8 @@ export default function ZoomIntegrationPage() {
     return fromAppMeta || fromUserMeta;
   }, [session]);
 
-  const oauthStartUrl = process.env.NEXT_PUBLIC_ZOOM_OAUTH_URL || "/(app)/integrations/zoom/linked".replace("/(app)", "");
-  const disconnectUrl = process.env.NEXT_PUBLIC_ZOOM_DISCONNECT_URL || "/(app)/integrations/zoom".replace("/(app)", "");
+  const oauthStartUrl = process.env.NEXT_PUBLIC_ZOOM_OAUTH_URL || "/integrations/zoom/linked".replace("/(app)", "");
+  const disconnectUrl = process.env.NEXT_PUBLIC_ZOOM_DISCONNECT_URL || "/integrations/zoom".replace("/(app)", "");
 
   const handleConnect = () => {
     if (!session) {

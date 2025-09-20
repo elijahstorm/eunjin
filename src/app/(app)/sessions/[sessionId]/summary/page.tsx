@@ -300,11 +300,11 @@ export default function SessionSummaryPage() {
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6">
       <div className="flex flex-col gap-3">
         <nav className="text-sm text-muted-foreground">
-          <Link href="/src/app/(app)/dashboard" className="hover:text-foreground">대시보드</Link>
+          <Link href="/dashboard" className="hover:text-foreground">대시보드</Link>
           <span className="px-2">/</span>
-          <Link href="/src/app/(app)/sessions" className="hover:text-foreground">세션</Link>
+          <Link href="/sessions" className="hover:text-foreground">세션</Link>
           <span className="px-2">/</span>
-          <Link href={`/src/app/(app)/sessions/${sessionId}`} className="hover:text-foreground">{sessionId}</Link>
+          <Link href={`/sessions/${sessionId}`} className="hover:text-foreground">{sessionId}</Link>
           <span className="px-2">/</span>
           <span className="text-foreground">요약</span>
         </nav>
@@ -315,7 +315,7 @@ export default function SessionSummaryPage() {
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href={`/src/app/(app)/sessions/${sessionId}/exports`}
+              href={`/sessions/${sessionId}/exports`}
               className="inline-flex items-center rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring"
             >
               내보내기
@@ -333,13 +333,13 @@ export default function SessionSummaryPage() {
       </div>
 
       <div className="flex w-full flex-wrap items-center gap-2 rounded-lg border bg-card p-2">
-        <NavLink href={`/src/app/(app)/sessions/${sessionId}/live`} label="라이브" active={pathname?.endsWith("/live")} />
-        <NavLink href={`/src/app/(app)/sessions/${sessionId}/transcript`} label="전사" active={pathname?.endsWith("/transcript")} />
-        <NavLink href={`/src/app/(app)/sessions/${sessionId}/highlights`} label="하이라이트" active={pathname?.endsWith("/highlights")} />
-        <NavLink href={`/src/app/(app)/sessions/${sessionId}/upload-highlights`} label="하이라이트 업로드" active={pathname?.endsWith("/upload-highlights")} />
-        <NavLink href={`/src/app/(app)/sessions/${sessionId}/summary`} label="요약" active={pathname?.endsWith("/summary")} />
-        <NavLink href={`/src/app/(app)/sessions/${sessionId}/exports`} label="내보내기" active={pathname?.endsWith("/exports")} />
-        <NavLink href={`/src/app/(app)/sessions/${sessionId}/settings`} label="설정" active={pathname?.endsWith("/settings")} />
+        <NavLink href={`/sessions/${sessionId}/live`} label="라이브" active={pathname?.endsWith("/live")} />
+        <NavLink href={`/sessions/${sessionId}/transcript`} label="전사" active={pathname?.endsWith("/transcript")} />
+        <NavLink href={`/sessions/${sessionId}/highlights`} label="하이라이트" active={pathname?.endsWith("/highlights")} />
+        <NavLink href={`/sessions/${sessionId}/upload-highlights`} label="하이라이트 업로드" active={pathname?.endsWith("/upload-highlights")} />
+        <NavLink href={`/sessions/${sessionId}/summary`} label="요약" active={pathname?.endsWith("/summary")} />
+        <NavLink href={`/sessions/${sessionId}/exports`} label="내보내기" active={pathname?.endsWith("/exports")} />
+        <NavLink href={`/sessions/${sessionId}/settings`} label="설정" active={pathname?.endsWith("/settings")} />
       </div>
 
       {justPublished && shareLink && (
@@ -363,12 +363,12 @@ export default function SessionSummaryPage() {
           <AlertDescription className="mt-2 space-y-2 text-sm">
             <p>이 세션의 전사 또는 하이라이트가 필요합니다. 아래 페이지에서 데이터를 준비하세요.</p>
             <div className="flex flex-wrap gap-2">
-              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href={`/src/app/(app)/sessions/${sessionId}/transcript`}>전사 페이지</Link>
-              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href={`/src/app/(app)/sessions/${sessionId}/highlights`}>하이라이트 페이지</Link>
-              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href={`/src/app/(app)/sessions/${sessionId}/upload-highlights`}>하이라이트 업로드</Link>
-              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href="/src/app/(app)/ingest/upload">녹음 파일 가져오기</Link>
-              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href="/src/app/(app)/integrations/zoom">Zoom 연동</Link>
-              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href="/src/app/(app)/integrations/teams">Teams 연동</Link>
+              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href={`/sessions/${sessionId}/transcript`}>전사 페이지</Link>
+              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href={`/sessions/${sessionId}/highlights`}>하이라이트 페이지</Link>
+              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href={`/sessions/${sessionId}/upload-highlights`}>하이라이트 업로드</Link>
+              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href="/ingest/upload">녹음 파일 가져오기</Link>
+              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href="/integrations/zoom">Zoom 연동</Link>
+              <Link className="rounded-md bg-secondary px-3 py-1.5 text-xs text-secondary-foreground hover:opacity-90" href="/integrations/teams">Teams 연동</Link>
             </div>
           </AlertDescription>
         </Alert>
@@ -487,12 +487,12 @@ export default function SessionSummaryPage() {
             <h2 className="text-sm font-semibold">세션 빠른 이동</h2>
             <Separator className="my-3" />
             <div className="grid grid-cols-1 gap-2">
-              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/src/app/(app)/sessions/${sessionId}/live`}>라이브</Link>
-              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/src/app/(app)/sessions/${sessionId}/transcript`}>전사</Link>
-              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/src/app/(app)/sessions/${sessionId}/highlights`}>하이라이트</Link>
-              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/src/app/(app)/sessions/${sessionId}/upload-highlights`}>하이라이트 업로드</Link>
-              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/src/app/(app)/sessions/${sessionId}/exports`}>내보내기</Link>
-              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/src/app/(app)/sessions/${sessionId}/settings`}>설정</Link>
+              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/sessions/${sessionId}/live`}>라이브</Link>
+              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/sessions/${sessionId}/transcript`}>전사</Link>
+              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/sessions/${sessionId}/highlights`}>하이라이트</Link>
+              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/sessions/${sessionId}/upload-highlights`}>하이라이트 업로드</Link>
+              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/sessions/${sessionId}/exports`}>내보내기</Link>
+              <Link className="rounded-md bg-muted px-3 py-2 text-sm hover:bg-accent" href={`/sessions/${sessionId}/settings`}>설정</Link>
             </div>
           </div>
 
@@ -518,7 +518,7 @@ export default function SessionSummaryPage() {
             <h2 className="text-sm font-semibold">워크플로우</h2>
             <Separator className="my-3" />
             <ol className="list-inside list-decimal space-y-1 text-sm text-muted-foreground">
-              <li>녹음 가져오기: <Link href="/src/app/(app)/ingest/upload" className="underline">업로드</Link> 또는 <Link href="/src/app/(app)/integrations/zoom" className="underline">Zoom</Link>/<Link href="/src/app/(app)/integrations/teams" className="underline">Teams</Link></li>
+              <li>녹음 가져오기: <Link href="/ingest/upload" className="underline">업로드</Link> 또는 <Link href="/integrations/zoom" className="underline">Zoom</Link>/<Link href="/integrations/teams" className="underline">Teams</Link></li>
               <li>전사 확인 및 하이라이트 표시</li>
               <li>요약 재생성 → 편집 → 공유/내보내기</li>
             </ol>

@@ -220,11 +220,11 @@ export default function Page({ params }: PageProps) {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <nav className="text-sm text-muted-foreground flex flex-wrap items-center gap-2" aria-label="Breadcrumb">
-            <Link href="/src/app/(app)/dashboard" className="hover:text-foreground">대시보드</Link>
+            <Link href="/dashboard" className="hover:text-foreground">대시보드</Link>
             <span>/</span>
-            <Link href="/src/app/(app)/sessions" className="hover:text-foreground">세션</Link>
+            <Link href="/sessions" className="hover:text-foreground">세션</Link>
             <span>/</span>
-            <Link href={`/src/app/(app)/sessions/${sessionId}`} className="hover:text-foreground">{sessionId}</Link>
+            <Link href={`/sessions/${sessionId}`} className="hover:text-foreground">{sessionId}</Link>
             <span>/</span>
             <span className="text-foreground">하이라이트</span>
           </nav>
@@ -233,13 +233,13 @@ export default function Page({ params }: PageProps) {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href={`/src/app/(app)/sessions/${sessionId}/upload-highlights`}
+            href={`/sessions/${sessionId}/upload-highlights`}
             className="inline-flex items-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/90 border border-border"
           >
             업로드
           </Link>
           <Link
-            href={`/src/app/(app)/sessions/${sessionId}/summary`}
+            href={`/sessions/${sessionId}/summary`}
             className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             요약 만들기
@@ -248,13 +248,13 @@ export default function Page({ params }: PageProps) {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Link href={`/src/app/(app)/sessions/${sessionId}/live`} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">실시간 캡처</Link>
-        <Link href={`/src/app/(app)/sessions/${sessionId}/transcript`} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">전사 보기</Link>
-        <Link href={`/src/app/(app)/sessions/${sessionId}/exports`} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">내보내기</Link>
-        <Link href={`/src/app/(app)/sessions/${sessionId}/settings`} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">세션 설정</Link>
+        <Link href={`/sessions/${sessionId}/live`} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">실시간 캡처</Link>
+        <Link href={`/sessions/${sessionId}/transcript`} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">전사 보기</Link>
+        <Link href={`/sessions/${sessionId}/exports`} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">내보내기</Link>
+        <Link href={`/sessions/${sessionId}/settings`} className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">세션 설정</Link>
         <span className="mx-1 text-muted-foreground">•</span>
-        <Link href="/src/app/(app)/integrations/zoom" className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">Zoom 연동</Link>
-        <Link href="/src/app/(app)/integrations/teams" className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">Teams 연동</Link>
+        <Link href="/integrations/zoom" className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">Zoom 연동</Link>
+        <Link href="/integrations/teams" className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">Teams 연동</Link>
         <span className="mx-1 text-muted-foreground">•</span>
         <Link href="/src/app/help" className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4">도움말</Link>
       </div>
@@ -359,13 +359,13 @@ export default function Page({ params }: PageProps) {
             <div className="text-sm text-muted-foreground">총 {filtered.length}개</div>
             <div className="flex items-center gap-2">
               <Link
-                href={`/src/app/(app)/sessions/${sessionId}/upload-highlights`}
+                href={`/sessions/${sessionId}/upload-highlights`}
                 className="rounded-md border border-input px-3 py-1.5 text-sm hover:bg-muted"
               >
                 파일에서 가져오기
               </Link>
               <Link
-                href={`/src/app/(app)/sessions/${sessionId}/summary`}
+                href={`/sessions/${sessionId}/summary`}
                 className="rounded-md bg-secondary px-3 py-1.5 text-sm text-secondary-foreground hover:bg-secondary/90 border border-border"
               >
                 요약에 사용
@@ -385,26 +385,26 @@ export default function Page({ params }: PageProps) {
               <p className="mt-1 text-sm text-muted-foreground">실시간으로 표시하거나 파일을 업로드하여 하이라이트를 추가하세요.</p>
               <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                 <Link
-                  href={`/src/app/(app)/sessions/${sessionId}/live`}
+                  href={`/sessions/${sessionId}/live`}
                   className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   실시간으로 표시하기
                 </Link>
                 <Link
-                  href={`/src/app/(app)/sessions/${sessionId}/upload-highlights`}
+                  href={`/sessions/${sessionId}/upload-highlights`}
                   className="rounded-md border border-input px-4 py-2 text-sm hover:bg-muted"
                 >
                   하이라이트 업로드
                 </Link>
                 <Link
-                  href={`/src/app/(app)/ingest/upload`}
+                  href={`/ingest/upload`}
                   className="rounded-md border border-input px-4 py-2 text-sm hover:bg-muted"
                 >
                   녹음 업로드
                 </Link>
               </div>
               <div className="mt-4 text-xs text-muted-foreground">
-                요약 생성은 <Link href={`/src/app/(app)/sessions/${sessionId}/summary`} className="underline underline-offset-4 hover:text-foreground">요약 페이지</Link>에서 진행하세요.
+                요약 생성은 <Link href={`/sessions/${sessionId}/summary`} className="underline underline-offset-4 hover:text-foreground">요약 페이지</Link>에서 진행하세요.
               </div>
             </div>
           ) : (
@@ -498,7 +498,7 @@ export default function Page({ params }: PageProps) {
           <p className="text-sm text-muted-foreground mt-1">하이라이트를 기반으로 간추린 요약을 생성합니다. 세부 설정은 요약 페이지에서 지정할 수 있습니다.</p>
           <div className="mt-3 flex gap-2">
             <Link
-              href={`/src/app/(app)/sessions/${sessionId}/summary`}
+              href={`/sessions/${sessionId}/summary`}
               className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
               요약 만들기
@@ -514,15 +514,15 @@ export default function Page({ params }: PageProps) {
             보존 기간을 설정하거나 조직 정책을 관리하세요. 통합을 연결하면 회의 녹음을 자동으로 가져올 수 있습니다.
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Link href="/src/app/(app)/org/retention" className="rounded-md border border-input px-3 py-1.5 text-sm hover:bg-muted">보존 정책</Link>
-            <Link href="/src/app/(app)/org/security" className="rounded-md border border-input px-3 py-1.5 text-sm hover:bg-muted">보안 설정</Link>
-            <Link href="/src/app/(app)/consent/new" className="rounded-md border border-input px-3 py-1.5 text-sm hover:bg-muted">녹음 동의 수집</Link>
+            <Link href="/org/retention" className="rounded-md border border-input px-3 py-1.5 text-sm hover:bg-muted">보존 정책</Link>
+            <Link href="/org/security" className="rounded-md border border-input px-3 py-1.5 text-sm hover:bg-muted">보안 설정</Link>
+            <Link href="/consent/new" className="rounded-md border border-input px-3 py-1.5 text-sm hover:bg-muted">녹음 동의 수집</Link>
           </div>
         </div>
       </div>
 
       <div className="text-xs text-muted-foreground">
-        더 많은 기능은 <Link href="/src/app/(app)/integrations/zoom" className="underline underline-offset-4 hover:text-foreground">Zoom</Link> / <Link href="/src/app/(app)/integrations/teams" className="underline underline-offset-4 hover:text-foreground">Teams</Link> 연동 및 <Link href={`/src/app/(app)/sessions/${sessionId}/transcript`} className="underline underline-offset-4 hover:text-foreground">전사</Link> 페이지에서 확인하세요.
+        더 많은 기능은 <Link href="/integrations/zoom" className="underline underline-offset-4 hover:text-foreground">Zoom</Link> / <Link href="/integrations/teams" className="underline underline-offset-4 hover:text-foreground">Teams</Link> 연동 및 <Link href={`/sessions/${sessionId}/transcript`} className="underline underline-offset-4 hover:text-foreground">전사</Link> 페이지에서 확인하세요.
       </div>
 
       <KeybindH onTrigger={addNow} />

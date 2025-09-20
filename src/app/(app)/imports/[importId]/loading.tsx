@@ -58,7 +58,7 @@ export default function Loading() {
             <p className="text-sm text-muted-foreground">전사, 화자 분리, 하이라이트 인덱싱과 요약을 준비하고 있어요.</p>
           </div>
           <div className="hidden md:flex gap-2">
-            <Link href="/src/app/(app)/dashboard" className="hidden" aria-hidden />
+            <Link href="/dashboard" className="hidden" aria-hidden />
             <Link
               href="/" // dashboard assumed at root of (app)/layout
               className="inline-flex items-center gap-2 rounded-md bg-secondary px-3 py-1.5 text-sm text-secondary-foreground hover:opacity-90"
@@ -216,7 +216,7 @@ export default function Loading() {
               </div>
               <div className="flex gap-2">
                 <Link
-                  href="/src/app/(app)/sessions/[sessionId]/upload-highlights"
+                  href="/sessions/[sessionId]/upload-highlights"
                   className="hidden"
                   aria-hidden
                 />
