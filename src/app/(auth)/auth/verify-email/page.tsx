@@ -57,7 +57,7 @@ export default function VerifyEmailPage() {
 
       try {
         if (code) {
-          const { error, data } = await supabaseBrowser.auth.exchangeCodeForSession({ code });
+          const { error, data } = await supabaseBrowser.auth.exchangeCodeForSession(code );
           if (error) throw error;
           const authedEmail = data?.user?.email ?? emailParam ?? null;
           setEmail(authedEmail);
@@ -82,7 +82,6 @@ export default function VerifyEmailPage() {
         const { data: userData } = await supabaseBrowser.auth.getUser();
         const authedUser = userData?.user ?? null;
         if (authedUser) {
-          // @ts-expect-error Supabase typings may not include email_confirmed_at in some versions
           const confirmedAt = (authedUser as any)?.email_confirmed_at as string | null | undefined;
           setEmail(authedUser.email ?? emailParam ?? null);
           if (confirmedAt) {

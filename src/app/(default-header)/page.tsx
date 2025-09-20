@@ -58,8 +58,8 @@ export default function Page() {
       ];
     }
     return [
-      { href: "/(auth)/auth/sign-in", label: "지금 로그인" },
-      { href: "/(auth)/auth/sign-up", label: "무료로 시작" },
+      { href: "/auth/sign-in", label: "지금 로그인" },
+      { href: "/auth/sign-up", label: "무료로 시작" },
     ];
   }, [isAuthed, checking]);
 
@@ -287,8 +287,8 @@ export default function Page() {
               </>
             ) : (
               <>
-                <Link href="/(auth)/auth/sign-in" className="inline-flex items-center rounded-md bg-background px-5 py-2.5 text-sm font-medium text-foreground hover:bg-background/90">로그인</Link>
-                <Link href="/(auth)/auth/sign-up" className="inline-flex items-center rounded-md border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium hover:bg-primary-foreground/10">무료로 시작</Link>
+                <Link href="/auth/sign-in" className="inline-flex items-center rounded-md bg-background px-5 py-2.5 text-sm font-medium text-foreground hover:bg-background/90">로그인</Link>
+                <Link href="/auth/sign-up" className="inline-flex items-center rounded-md border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium hover:bg-primary-foreground/10">무료로 시작</Link>
               </>
             )}
             <Link href="/legal/privacy" className="inline-flex items-center rounded-md border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium hover:bg-primary-foreground/10">개인정보처리방침</Link>

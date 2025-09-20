@@ -440,7 +440,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <div className="space-y-1">
                 <NavLink href="/integrations/zoom/linked" icon={PlugZap} label="Zoom linked" active={pathname === "/integrations/zoom/linked"} />
                 <NavLink href="/integrations/teams/linked" icon={PlugZap} label="Teams linked" active={pathname === "/integrations/teams/linked"} />
-                <NavLink href="/imports/[importId]" icon={HardDriveUpload} label="Recent import" active={pathname === "/imports/[importId]"} />
                 <NavLink href="/offline" icon={WifiOff} label="Offline" active={pathname === "/offline"} />
               </div>
             </div>

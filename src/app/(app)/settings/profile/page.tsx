@@ -212,7 +212,7 @@ export default function ProfileSettingsPage() {
           <Alert className="border-border bg-card">
             <AlertTitle>로그인이 필요합니다</AlertTitle>
             <AlertDescription>
-              계속하려면 계정에 로그인하세요. <Link className="underline underline-offset-4" href="/(auth)/auth/sign-in">로그인</Link>
+              계속하려면 계정에 로그인하세요. <Link className="underline underline-offset-4" href="/auth/sign-in">로그인</Link>
             </AlertDescription>
           </Alert>
         )}
