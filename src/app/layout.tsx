@@ -8,6 +8,8 @@
 
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { Suspense } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
@@ -66,7 +68,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+function RootLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
@@ -88,3 +90,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   )
 }
 
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<main className="w-full"><div className="mx-auto max-w-2xl px-4 py-10 sm:py-14"><Skeleton className="h-10 w-full" /><Skeleton className="h-5 w-1/3" /></div></main>}>
+      <RootLayoutInner>
+        {children}
+      </RootLayoutInner>
+    </Suspense>
+  );
+}

@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * CODE INSIGHT
  * This code's use case is to provide the global Root Layout for the Next.js app. It defines global metadata,
@@ -6,10 +8,12 @@
  * import global styles via ./globals.css.
  */
 
-import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
+import { useState } from 'react'
+import { Menu, X } from 'lucide-react'
 
 export default function DefaultHeaderLayout({ children }: { children: React.ReactNode }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -20,7 +24,7 @@ export default function DefaultHeaderLayout({ children }: { children: React.Reac
                 <span className="inline-block h-2 w-2 rounded-sm bg-primary" aria-hidden />
                 <span className="tracking-tight">Summarize Live</span>
               </Link>
-              <nav className="hidden md:flex items-center gap-1 text-sm">
+              <nav className="hidden lg:flex items-center gap-1 text-sm">
                 <NavLink href="/dashboard">대시보드</NavLink>
                 <NavLink href="/sessions">세션</NavLink>
                 <NavLink href="/ingest">인제스트</NavLink>
@@ -30,6 +34,14 @@ export default function DefaultHeaderLayout({ children }: { children: React.Reac
                 <NavLink href="/legal">정책</NavLink>
                 <NavLink href="/offline">오프라인</NavLink>
               </nav>
+              {/* Mobile menu button */}
+              <button
+                className="lg:hidden ml-2 p-2 rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label="Open menu"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="size-6" />
+              </button>
             </div>
             <div className="flex items-center gap-2">
               <div className="hidden sm:flex items-center gap-2">
@@ -52,6 +64,49 @@ export default function DefaultHeaderLayout({ children }: { children: React.Reac
             </div>
           </div>
         </div>
+        {/* Mobile menu overlay */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex flex-col">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-border">
+              <Link href="/" className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-lg font-semibold">
+                <span className="inline-block h-2 w-2 rounded-sm bg-primary" aria-hidden />
+                <span className="tracking-tight">Summarize Live</span>
+              </Link>
+              <button
+                className="p-2 rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label="Close menu"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <X className="size-6" />
+              </button>
+            </div>
+            <nav className="flex flex-col gap-2 px-4 py-6 text-base bg-background">
+              <NavLink href="/dashboard">대시보드</NavLink>
+              <NavLink href="/sessions">세션</NavLink>
+              <NavLink href="/ingest">인제스트</NavLink>
+              <NavLink href="/imports">임포트</NavLink>
+              <NavLink href="/integrations">연동</NavLink>
+              <NavLink href="/help">도움말</NavLink>
+              <NavLink href="/legal">정책</NavLink>
+              <NavLink href="/offline">오프라인</NavLink>
+              <HeaderLink href="/integrations/zoom">Zoom</HeaderLink>
+              <HeaderLink href="/integrations/teams">Teams</HeaderLink>
+              <HeaderLink href="/org">조직</HeaderLink>
+              <Link
+                href="/sessions/new"
+                className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-base font-medium text-primary-foreground shadow hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                새 세션 시작
+              </Link>
+              <Link
+                href="/auth/sign-in"
+                className="mt-2 inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-base font-medium hover:bg-accent hover:text-accent-foreground"
+              >
+                로그인
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       <main id="main" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">

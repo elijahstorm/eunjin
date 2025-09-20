@@ -7,7 +7,7 @@
  * or the dashboard, with additional helpful navigation links to key areas of the app.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/utils/supabase/client-browser";
@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type Status = "idle" | "verifying" | "success" | "error" | "already";
 
-export default function VerifyEmailPage() {
+function VerifyEmailPageInner() {
   const search = useSearchParams();
   const router = useRouter();
   const ran = useRef(false);
@@ -290,5 +290,13 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<main className="w-full"><div className="mx-auto max-w-2xl px-4 py-10 sm:py-14"><Skeleton className="h-10 w-full" /><Skeleton className="h-5 w-1/3" /></div></main>}>
+      <VerifyEmailPageInner />
+    </Suspense>
   );
 }
