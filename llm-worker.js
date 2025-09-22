@@ -1,7 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
-import { generateText } from "ai";
-import { openai } from '@ai-sdk/openai';
-import dotenv from "dotenv";
+const { createClient } = require("@supabase/supabase-js");
+const { generateText } = require("ai");
+const { openai } = require("@ai-sdk/openai");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
