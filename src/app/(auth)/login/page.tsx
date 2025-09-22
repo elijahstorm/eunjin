@@ -7,7 +7,7 @@
  * and redirects authenticated users to /dashboard or /onboarding/welcome if they appear to be first-time users.
  */
 
-import { useEffect, useMemo, useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { supabaseBrowser } from "@/utils/supabase/client-browser"
@@ -15,7 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils/utils"
 
-export default function LoginPage() {
+function CallbackHandler() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -302,4 +302,37 @@ export default function LoginPage() {
       </div>
     </main>
   )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <main className="flex min-h-[60vh] items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 blur-2xl" aria-hidden />
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="mb-6">
+                <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 p-2">
+                  <div className="h-full w-full animate-spin rounded-full border-2 border-primary border-t-transparent" aria-label="로딩 중" />
+                </div>
+              </div>
+              <h1 className="mb-2 text-lg font-semibold text-foreground">인증 처리 중</h1>
+              <p className="mb-6 text-sm text-muted-foreground">링크 확인 중...</p>
+              <div className="mt-2 flex items-center space-x-2 text-xs text-muted-foreground">
+                <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+                <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-primary [animation-delay:150ms]" />
+                <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-primary [animation-delay:300ms]" />
+              </div>
+              <div className="mt-8 text-xs text-muted-foreground">
+                <p>잠시만 기다려주세요. 자동으로 이동합니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    }>
+      <CallbackHandler />
+    </Suspense>
+  );
 }
