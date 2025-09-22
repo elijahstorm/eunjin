@@ -336,7 +336,6 @@ export default function UploadPage() {
             .upload(path, file, {
               upsert: false,
               contentType: file.type || undefined,
-              // @ts-expect-error: future option may accept onUploadProgress; simulated progress used.
             });
 
           if (upErr) {

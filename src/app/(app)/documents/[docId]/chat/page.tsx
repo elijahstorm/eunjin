@@ -304,8 +304,8 @@ export default function DocumentChatPage() {
         { event: "INSERT", schema: "public", table: "chat_messages", filter: `session_id=eq.${session.id}` },
         async (payload) => {
           const newMessage = payload.new as ChatMessageRow;
-          setMessages((prev) => [...prev, newMessage]);
           if (newMessage.role === "assistant") {
+            setMessages((prev) => [...prev, newMessage]);
             setPendingAssistant(false);
             await loadCitationsForMessages([newMessage.id]);
           }
