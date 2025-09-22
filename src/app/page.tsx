@@ -22,13 +22,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 
 export default function Page() {
-  const supabase = React.useMemo(() => supabaseBrowser(), []);
   const [isAuthed, setIsAuthed] = React.useState<boolean>(false);
   const [authReady, setAuthReady] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     let unsub: (() => void) | undefined;
-    supabase.auth
+    supabaseBrowser.auth
       .getSession()
       .then(({ data }) => {
         setIsAuthed(Boolean(data.session));
@@ -36,7 +35,7 @@ export default function Page() {
       })
       .catch(() => setAuthReady(true));
 
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabaseBrowser.auth.onAuthStateChange((_event, session) => {
       setIsAuthed(Boolean(session));
     });
     unsub = () => data.subscription.unsubscribe();
@@ -48,7 +47,7 @@ export default function Page() {
         // no-op
       }
     };
-  }, [supabase]);
+  }, [supabaseBrowser]);
 
   return (
     <main className="relative isolate">

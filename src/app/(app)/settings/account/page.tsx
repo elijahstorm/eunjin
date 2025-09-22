@@ -24,7 +24,6 @@ type Profile = {
 };
 
 export default function AccountSettingsPage() {
-  const supabase = useMemo(() => supabaseBrowser(), []);
   const pathname = usePathname();
 
   const [loading, setLoading] = useState(true);
@@ -59,7 +58,7 @@ export default function AccountSettingsPage() {
       const {
         data: { user },
         error: userErr,
-      } = await supabase.auth.getUser();
+      } = await supabaseBrowser.auth.getUser();
       if (userErr) throw userErr;
       if (!user) {
         setUserId(null);
@@ -73,7 +72,7 @@ export default function AccountSettingsPage() {
       setEmail(user.email ?? "");
       setInitialEmail(user.email ?? "");
 
-      const { data: prof, error: profErr } = await supabase
+      const { data: prof, error: profErr } = await supabaseBrowser
         .from("profiles")
         .select("id,user_id,display_name,avatar_url")
         .eq("user_id", user.id)
@@ -97,7 +96,7 @@ export default function AccountSettingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, [supabaseBrowser]);
 
   useEffect(() => {
     loadData();
@@ -114,7 +113,7 @@ export default function AccountSettingsPage() {
         avatar_url: profile.avatar_url,
         updated_at: new Date().toISOString(),
       };
-      const { data, error } = await supabase.from("profiles").upsert(payload, { onConflict: "user_id" }).select().maybeSingle();
+      const { data, error } = await supabaseBrowser.from("profiles").upsert(payload, { onConflict: "user_id" }).select().maybeSingle();
       if (error) throw error;
       const updated: Profile = {
         id: data?.id,
@@ -130,7 +129,7 @@ export default function AccountSettingsPage() {
     } finally {
       setSaving(false);
     }
-  }, [profile, supabase, userId]);
+  }, [profile, supabaseBrowser, userId]);
 
   const onUpdateEmail = useCallback(async () => {
     if (!hasEmailChange) return;
@@ -141,7 +140,7 @@ export default function AccountSettingsPage() {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
         throw new Error("올바른 이메일 형식이 아닙니다.");
       }
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
+      const { error } = await supabaseBrowser.auth.updateUser({ email: newEmail });
       if (error) throw error;
       setInitialEmail(newEmail);
       setMessage({
@@ -154,7 +153,7 @@ export default function AccountSettingsPage() {
     } finally {
       setEmailSaving(false);
     }
-  }, [email, hasEmailChange, supabase.auth]);
+  }, [email, hasEmailChange, supabaseBrowser.auth]);
 
   const onAvatarPick = useCallback(async (file: File) => {
     if (!userId) return;
@@ -174,14 +173,14 @@ export default function AccountSettingsPage() {
     try {
       const ext = file.name.split(".").pop() || "png";
       const path = `${userId}/avatar-${Date.now()}.${ext}`;
-      const { error: uploadErr } = await supabase.storage.from("avatars").upload(path, file, {
+      const { error: uploadErr } = await supabaseBrowser.storage.from("avatars").upload(path, file, {
         upsert: true,
         cacheControl: "3600",
         contentType: file.type,
       });
       if (uploadErr) throw uploadErr;
 
-      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const { data } = supabaseBrowser.storage.from("avatars").getPublicUrl(path);
       const publicUrl = data?.publicUrl;
       if (!publicUrl) throw new Error("퍼블릭 URL을 생성할 수 없습니다.");
 
@@ -197,7 +196,7 @@ export default function AccountSettingsPage() {
       setAvatarUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
-  }, [supabase.storage, userId]);
+  }, [supabaseBrowser.storage, userId]);
 
   const onAvatarInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const f = e.target.files?.[0];

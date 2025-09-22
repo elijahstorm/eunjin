@@ -75,7 +75,6 @@ function formatKoreanTime(d: Date) {
 
 export default function ReviewsPage() {
   const router = useRouter();
-  const supabase = useMemo(() => supabaseBrowser(), []);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -100,7 +99,7 @@ export default function ReviewsPage() {
       setLoading(true);
       setError(null);
       try {
-        const { data: authData, error: authErr } = await supabase.auth.getUser();
+        const { data: authData, error: authErr } = await supabaseBrowser.auth.getUser();
         if (authErr) throw authErr;
         const u = authData?.user ?? null;
         if (!u) {
@@ -114,7 +113,7 @@ export default function ReviewsPage() {
         setUserId(u.id);
 
         // Fetch SRS cards due by next 7 days end
-        const { data: cardData, error: cardErr } = await supabase
+        const { data: cardData, error: cardErr } = await supabaseBrowser
           .from("srs_cards")
           .select("id, document_id, due_at, last_reviewed_at, interval_days, ease_factor, repetitions, status")
           .eq("user_id", u.id)
@@ -128,7 +127,7 @@ export default function ReviewsPage() {
         // Fetch documents for titles
         const docIds = Array.from(new Set(safeCards.map((c) => c.document_id).filter(Boolean))) as string[];
         if (docIds.length > 0) {
-          const { data: docs, error: docsErr } = await supabase
+          const { data: docs, error: docsErr } = await supabaseBrowser
             .from("documents")
             .select("id, title")
             .in("id", docIds);
@@ -145,7 +144,7 @@ export default function ReviewsPage() {
         // Fetch recent reviews to compute streak
         try {
           const since = addDays(now, -60);
-          const { data: reviews, error: rErr } = await supabase
+          const { data: reviews, error: rErr } = await supabaseBrowser
             .from("srs_reviews")
             .select("id, reviewed_at, card_id, srs_cards!inner(user_id)")
             .eq("srs_cards.user_id", u.id)
@@ -204,7 +203,7 @@ export default function ReviewsPage() {
     return () => {
       cancelled = true;
     };
-  }, [endNext7, now, router, supabase]);
+  }, [endNext7, now, router, supabaseBrowser]);
 
   const stats = useMemo(() => {
     const startTs = startToday.getTime();

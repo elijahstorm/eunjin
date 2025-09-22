@@ -66,14 +66,13 @@ export default function DocumentSummaryPage() {
     setLoading(true);
     setError(null);
     try {
-      const supabase = supabaseBrowser();
       const [docRes, sumRes] = await Promise.all([
-        supabase
+        supabaseBrowser
           .from("documents")
           .select("id, title, original_filename, status, page_count, created_at, updated_at")
           .eq("id", docId)
           .single(),
-        supabase
+        supabaseBrowser
           .from("summaries")
           .select(
             "id, document_id, user_id, scope, length, section_label, page_from, page_to, content, created_at, updated_at"

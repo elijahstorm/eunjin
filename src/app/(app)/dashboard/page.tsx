@@ -4,7 +4,7 @@
  * CODE INSIGHT
  * This code's use case is to render the main authenticated dashboard for poiima users.
  * It provides progress stats, upcoming SRS reviews, recent activity, and quick actions.
- * The page loads user-specific data from Supabase (client-side) and presents a sleek,
+ * The page loads user-specific data from supabaseBrowser (client-side) and presents a sleek,
  * responsive UI without header/footer/sidebar. This page is production-ready and
  * optimized for clarity and usability on mobile and desktop.
  */
@@ -102,7 +102,6 @@ function timeFromNow(iso: string) {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const supabase = useMemo(() => supabaseBrowser(), []);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -129,7 +128,7 @@ export default function DashboardPage() {
     setLoading(true);
     try {
       // Profile
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData, error: profileError } = await supabaseBrowser
         .from("profiles")
         .select("id,user_id,display_name,avatar_url")
         .eq("user_id", uid)
@@ -138,7 +137,7 @@ export default function DashboardPage() {
       if (profileData) setProfile(profileData as Profile);
 
       // Stats: documents count
-      const { count: dCount, error: dErr } = await supabase
+      const { count: dCount, error: dErr } = await supabaseBrowser
         .from("documents")
         .select("id", { count: "exact", head: true })
         .eq("user_id", uid);
@@ -146,7 +145,7 @@ export default function DashboardPage() {
       setDocCount(dCount ?? 0);
 
       // Stats: quiz attempts count
-      const { count: qaCount, error: qaErr } = await supabase
+      const { count: qaCount, error: qaErr } = await supabaseBrowser
         .from("quiz_attempts")
         .select("id", { count: "exact", head: true })
         .eq("user_id", uid);
@@ -154,7 +153,7 @@ export default function DashboardPage() {
       setQuizAttemptCount(qaCount ?? 0);
 
       // Stats: quiz avg score (fetch subset for efficiency)
-      const { data: qaScores, error: qaScoresErr } = await supabase
+      const { data: qaScores, error: qaScoresErr } = await supabaseBrowser
         .from("quiz_attempts")
         .select("score")
         .eq("user_id", uid)
@@ -175,7 +174,7 @@ export default function DashboardPage() {
       const nowIso = new Date().toISOString();
 
       // Stats: due now count
-      const { count: dueCount, error: dueErr } = await supabase
+      const { count: dueCount, error: dueErr } = await supabaseBrowser
         .from("srs_cards")
         .select("id", { count: "exact", head: true })
         .eq("user_id", uid)
@@ -184,7 +183,7 @@ export default function DashboardPage() {
       setDueNowCount(dueCount ?? 0);
 
       // Stats: next due at
-      const { data: nextDue, error: nextErr } = await supabase
+      const { data: nextDue, error: nextErr } = await supabaseBrowser
         .from("srs_cards")
         .select("due_at")
         .eq("user_id", uid)
@@ -195,7 +194,7 @@ export default function DashboardPage() {
       setNextDueAt(nextDue && nextDue.length ? nextDue[0].due_at : null);
 
       // Recent documents
-      const { data: rDocs, error: rDocsErr } = await supabase
+      const { data: rDocs, error: rDocsErr } = await supabaseBrowser
         .from("documents")
         .select("id,user_id,title,status,created_at,page_count")
         .eq("user_id", uid)
@@ -205,7 +204,7 @@ export default function DashboardPage() {
       setRecentDocs((rDocs as DocumentRow[]) || []);
 
       // Due now list (top 5 by overdue)
-      const { data: dueList, error: dueListErr } = await supabase
+      const { data: dueList, error: dueListErr } = await supabaseBrowser
         .from("srs_cards")
         .select("id,user_id,document_id,quiz_question_id,chunk_id,due_at")
         .eq("user_id", uid)
@@ -216,7 +215,7 @@ export default function DashboardPage() {
       setDueNowList((dueList as SrsCardRow[]) || []);
 
       // Upcoming list (next 5)
-      const { data: upList, error: upErr } = await supabase
+      const { data: upList, error: upErr } = await supabaseBrowser
         .from("srs_cards")
         .select("id,user_id,document_id,quiz_question_id,chunk_id,due_at")
         .eq("user_id", uid)
@@ -227,7 +226,7 @@ export default function DashboardPage() {
       setUpcomingList((upList as SrsCardRow[]) || []);
 
       // Recent usage events
-      const { data: events, error: eventsErr } = await supabase
+      const { data: events, error: eventsErr } = await supabaseBrowser
         .from("usage_events")
         .select("id,user_id,event_type,related_document_id,provider,model,total_cost_usd,occurred_at")
         .eq("user_id", uid)
@@ -248,7 +247,7 @@ export default function DashboardPage() {
         if (ev.related_document_id) docIds.add(ev.related_document_id);
       }
       if (docIds.size > 0) {
-        const { data: titles, error: titlesErr } = await supabase
+        const { data: titles, error: titlesErr } = await supabaseBrowser
           .from("documents")
           .select("id,title")
           .in("id", Array.from(docIds));
@@ -264,7 +263,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, [supabaseBrowser]);
 
   useEffect(() => {
     let mounted = true;
@@ -272,7 +271,7 @@ export default function DashboardPage() {
       const {
         data: { user },
         error: userErr,
-      } = await supabase.auth.getUser();
+      } = await supabaseBrowser.auth.getUser();
       if (userErr || !user) {
         router.replace("/login?next=/dashboard");
         return;
@@ -282,7 +281,7 @@ export default function DashboardPage() {
       await loadData(user.id as UUID);
     })();
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = supabaseBrowser.auth.onAuthStateChange((_event, session) => {
       if (!session?.user) {
         router.replace("/login?next=/dashboard");
       }
@@ -292,7 +291,7 @@ export default function DashboardPage() {
       mounted = false;
       sub?.subscription.unsubscribe();
     };
-  }, [router, supabase, loadData]);
+  }, [router, supabaseBrowser, loadData]);
 
   const greeting = useMemo(() => {
     const name = profile?.display_name?.trim();

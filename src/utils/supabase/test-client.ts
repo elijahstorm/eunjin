@@ -6,11 +6,23 @@ interface FakeQueryBuilder<T = any> {
     eq(column: string, value: any): FakeQueryBuilder<T>
     or(filter: string): FakeQueryBuilder<T>
     is(column: string, value: any): FakeQueryBuilder<T>
+    not(column: string, operator: string, value: any): FakeQueryBuilder<T>
+    lte(column: string, value: any): FakeQueryBuilder<T>
+    lt(column: string, value: any): FakeQueryBuilder<T>
+    gte(column: string, value: any): FakeQueryBuilder<T>
+    gt(column: string, value: any): FakeQueryBuilder<T>
+    neq(column: string, value: any): FakeQueryBuilder<T>
+    in(column: string, values: any[]): FakeQueryBuilder<T>
+    like(column: string, pattern: string): FakeQueryBuilder<T>
+    ilike(column: string, pattern: string): FakeQueryBuilder<T>
+    match(query: Record<string, any>): FakeQueryBuilder<T>
     order(
         column: string,
         options?: { ascending?: boolean; nullsFirst?: boolean }
     ): FakeQueryBuilder<T>
+    limit(count: number): FakeQueryBuilder<T>
     single(): Promise<{ data: T | null; error: any }>
+    maybeSingle(): Promise<{ data: T | null; error: any }>
     then<TResult1 = T[], TResult2 = never>(
         onfulfilled?:
             | ((value: { data: T[]; error: any }) => TResult1 | PromiseLike<TResult1>)
@@ -190,8 +202,14 @@ class FakeQueryBuilder<T = any> implements FakeQueryBuilder<T> {
     private data: T[]
     private table: string
     private selectedColumns: string = '*'
-    private filters: Array<{ type: 'eq' | 'or' | 'is'; column: string; value: any }> = []
+    private filters: Array<{
+        type: 'eq' | 'or' | 'is' | 'not' | 'lte' | 'lt' | 'gte' | 'gt' | 'neq' | 'in' | 'like' | 'ilike';
+        column: string;
+        value: any;
+        operator?: 'eq' | 'or' | 'is';
+    }> = []
     private orderBy: { column: string; ascending: boolean; nullsFirst: boolean } | null = null
+    private rowLimit: number | null = null
 
     constructor(data: T[], table: string) {
         this.data = Array.isArray(data) ? data : []
@@ -200,6 +218,11 @@ class FakeQueryBuilder<T = any> implements FakeQueryBuilder<T> {
 
     select(columns: string = '*'): FakeQueryBuilder<T> {
         this.selectedColumns = columns
+        return this
+    }
+
+    limit(count: number): FakeQueryBuilder<T> {
+        this.rowLimit = count
         return this
     }
 
@@ -219,6 +242,59 @@ class FakeQueryBuilder<T = any> implements FakeQueryBuilder<T> {
         return this
     }
 
+    not(column: string, operator: 'eq'|'or'|'is', value: any): FakeQueryBuilder<T> {
+        // Only support 'is' for now, matching Supabase .not(column, 'is', value)
+        this.filters.push({ type: 'not', column, operator, value })
+        return this
+    }
+
+        lte(column: string, value: any): FakeQueryBuilder<T> {
+        this.filters.push({ type: 'lte', column, value })
+        return this;
+    }
+
+    lt(column: string, value: any): FakeQueryBuilder<T> {
+        this.filters.push({ type: 'lt', column, value })
+        return this;
+    }
+
+    gte(column: string, value: any): FakeQueryBuilder<T> {
+        this.filters.push({ type: 'gte', column, value })
+        return this;
+    }
+
+    gt(column: string, value: any): FakeQueryBuilder<T> {
+        this.filters.push({ type: 'gt', column, value })
+        return this;
+    }
+
+    neq(column: string, value: any): FakeQueryBuilder<T> {
+        this.filters.push({ type: 'neq', column, value })
+        return this;
+    }
+
+    in(column: string, values: any[]): FakeQueryBuilder<T> {
+        this.filters.push({ type: 'in', column, value: values })
+        return this;
+    }
+
+    like(column: string, pattern: string): FakeQueryBuilder<T> {
+        this.filters.push({ type: 'like', column, value: pattern })
+        return this;
+    }
+
+    ilike(column: string, pattern: string): FakeQueryBuilder<T> {
+        this.filters.push({ type: 'ilike', column, value: pattern })
+        return this;
+    }
+
+    match(query: Record<string, any>): FakeQueryBuilder<T> {
+        Object.entries(query).forEach(([column, value]) => {
+            this.filters.push({ type: 'eq', column, value })
+        });
+        return this;
+    }
+
     order(
         column: string,
         options: { ascending?: boolean; nullsFirst?: boolean } = {}
@@ -233,15 +309,74 @@ class FakeQueryBuilder<T = any> implements FakeQueryBuilder<T> {
 
     private applyFilters(data: T[]): T[] {
         return data.filter((item) => {
-            // Apply eq filters
+            // eq
             const eqFilters = this.filters.filter((f) => f.type === 'eq')
             for (const filter of eqFilters) {
                 if ((item as any)[filter.column] !== filter.value) {
                     return false
                 }
             }
-
-            // Apply is filters (for null/not null checks)
+            // neq
+            const neqFilters = this.filters.filter((f) => f.type === 'neq')
+            for (const filter of neqFilters) {
+                if ((item as any)[filter.column] === filter.value) {
+                    return false
+                }
+            }
+            // lte
+            const lteFilters = this.filters.filter((f) => f.type === 'lte')
+            for (const filter of lteFilters) {
+                if ((item as any)[filter.column] > filter.value) {
+                    return false
+                }
+            }
+            // lt
+            const ltFilters = this.filters.filter((f) => f.type === 'lt')
+            for (const filter of ltFilters) {
+                if ((item as any)[filter.column] >= filter.value) {
+                    return false
+                }
+            }
+            // gte
+            const gteFilters = this.filters.filter((f) => f.type === 'gte')
+            for (const filter of gteFilters) {
+                if ((item as any)[filter.column] < filter.value) {
+                    return false
+                }
+            }
+            // gt
+            const gtFilters = this.filters.filter((f) => f.type === 'gt')
+            for (const filter of gtFilters) {
+                if ((item as any)[filter.column] <= filter.value) {
+                    return false
+                }
+            }
+            // in
+            const inFilters = this.filters.filter((f) => f.type === 'in')
+            for (const filter of inFilters) {
+                if (!Array.isArray(filter.value) || !filter.value.includes((item as any)[filter.column])) {
+                    return false
+                }
+            }
+            // like
+            const likeFilters = this.filters.filter((f) => f.type === 'like')
+            for (const filter of likeFilters) {
+                const val = (item as any)[filter.column]
+                const regex = new RegExp('^' + filter.value.replace(/%/g, '.*') + '$')
+                if (typeof val !== 'string' || !regex.test(val)) {
+                    return false
+                }
+            }
+            // ilike
+            const ilikeFilters = this.filters.filter((f) => f.type === 'ilike')
+            for (const filter of ilikeFilters) {
+                const val = (item as any)[filter.column]
+                const regex = new RegExp('^' + filter.value.replace(/%/g, '.*') + '$', 'i')
+                if (typeof val !== 'string' || !regex.test(val)) {
+                    return false
+                }
+            }
+            // is
             const isFilters = this.filters.filter((f) => f.type === 'is')
             for (const filter of isFilters) {
                 const itemValue = (item as any)[filter.column]
@@ -252,15 +387,25 @@ class FakeQueryBuilder<T = any> implements FakeQueryBuilder<T> {
                     return false
                 }
             }
-
-            // Apply OR filters
+            // NOT filters
+            const notFilters = this.filters.filter((f) => f.type === 'not')
+            for (const filter of notFilters) {
+                const itemValue = (item as any)[filter.column]
+                if (filter.operator === 'is') {
+                    if (filter.value === null && itemValue === null) {
+                        return false
+                    }
+                    if (filter.value !== null && itemValue === filter.value) {
+                        return false
+                    }
+                }
+            }
+            // OR filters
             const orFilters = this.filters.filter((f) => f.type === 'or')
             if (orFilters.length === 0) return true
-
             for (const orFilter of orFilters) {
                 const orConditions = orFilter.value.split(',')
                 let orMatch = false
-
                 for (const condition of orConditions) {
                     const [path, op, value] = condition.split('.')
                     if (op === 'eq' && (item as any)[path] === value) {
@@ -268,10 +413,8 @@ class FakeQueryBuilder<T = any> implements FakeQueryBuilder<T> {
                         break
                     }
                 }
-
                 if (!orMatch) return false
             }
-
             return true
         })
     }
@@ -316,10 +459,34 @@ class FakeQueryBuilder<T = any> implements FakeQueryBuilder<T> {
         try {
             let filtered = this.applyFilters(this.data)
             filtered = this.applySorting(filtered)
+            if (this.rowLimit !== null) {
+                filtered = filtered.slice(0, this.rowLimit)
+            }
             const item = filtered.length > 0 ? filtered[0] : null
 
             return {
                 data: item ? this.selectColumns(item) : null,
+                error: null,
+            }
+        } catch (error) {
+            return {
+                data: null,
+                error,
+            }
+        }
+    }
+
+    async maybeSingle(): Promise<{ data: T | null; error: any }> {
+        try {
+            let filtered = this.applyFilters(this.data)
+            filtered = this.applySorting(filtered)
+            if (this.rowLimit !== null) {
+                filtered = filtered.slice(0, this.rowLimit)
+            }
+            // Supabase maybeSingle returns first row or null, but does not error if >1 row
+            const item = filtered.length > 0 ? this.selectColumns(filtered[0]) : null
+            return {
+                data: item,
                 error: null,
             }
         } catch (error) {
@@ -341,6 +508,9 @@ class FakeQueryBuilder<T = any> implements FakeQueryBuilder<T> {
         try {
             let filtered = this.applyFilters(this.data)
             filtered = this.applySorting(filtered)
+            if (this.rowLimit !== null) {
+                filtered = filtered.slice(0, this.rowLimit)
+            }
             const selected = filtered.map((item) => this.selectColumns(item))
 
             const result = { data: selected, error: null }

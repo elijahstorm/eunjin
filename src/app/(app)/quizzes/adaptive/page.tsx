@@ -74,10 +74,9 @@ export default function AdaptiveQuizSetupPage() {
     let cancelled = false;
     const run = async () => {
       try {
-        const supabase = supabaseBrowser();
         const {
           data: { user },
-        } = await supabase.auth.getUser();
+        } = await supabaseBrowser.auth.getUser();
         if (!user) {
           router.replace("/login?next=/quizzes/adaptive");
           return;
@@ -87,7 +86,7 @@ export default function AdaptiveQuizSetupPage() {
 
         setLoading(true);
         // Fetch user's documents for selection
-        const { data: docsData, error: docsErr } = await supabase
+        const { data: docsData, error: docsErr } = await supabaseBrowser
           .from("documents")
           .select("id,title")
           .eq("user_id", user.id)
@@ -98,7 +97,7 @@ export default function AdaptiveQuizSetupPage() {
         if (!cancelled) setDocuments(docsData || []);
 
         // Fetch recent quiz attempts for this user
-        const { data: attemptsData, error: attemptsErr } = await supabase
+        const { data: attemptsData, error: attemptsErr } = await supabaseBrowser
           .from("quiz_attempts")
           .select("id,started_at,completed_at,score")
           .eq("user_id", user.id)
@@ -117,7 +116,7 @@ export default function AdaptiveQuizSetupPage() {
           return;
         }
 
-        const { data: qaData, error: qaErr } = await supabase
+        const { data: qaData, error: qaErr } = await supabaseBrowser
           .from("question_attempts")
           .select("id,quiz_attempt_id,question_id,is_correct,created_at,score")
           .in("quiz_attempt_id", attemptIds);
@@ -127,7 +126,7 @@ export default function AdaptiveQuizSetupPage() {
 
         let questionRows: QuizQuestion[] = [];
         if (questionIds.length > 0) {
-          const { data: qRows, error: qErr } = await supabase
+          const { data: qRows, error: qErr } = await supabaseBrowser
             .from("quiz_questions")
             .select("id,difficulty,chunk_id,quiz_set_id")
             .in("id", questionIds);
@@ -144,7 +143,7 @@ export default function AdaptiveQuizSetupPage() {
 
         const chunkIds = Array.from(new Set(questionRows.map((q) => q.chunk_id).filter(Boolean))) as string[];
         if (chunkIds.length > 0) {
-          const { data: chunkRows, error: chunkErr } = await supabase
+          const { data: chunkRows, error: chunkErr } = await supabaseBrowser
             .from("document_chunks")
             .select("id,document_id")
             .in("id", chunkIds);

@@ -27,7 +27,6 @@ export default function Page() {
 
     const run = async () => {
       try {
-        const supabase = supabaseBrowser();
 
         const error = searchParams.get("error");
         const error_description = searchParams.get("error_description");
@@ -52,7 +51,7 @@ export default function Page() {
         const code = searchParams.get("code");
         if (code) {
           setStatus("세션 생성 중...");
-          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          const { error: exchangeError } = await supabaseBrowser.auth.exchangeCodeForSession(code);
           if (exchangeError) {
             setErrorMessage(exchangeError.message || "세션 교환 중 오류가 발생했습니다.");
             setStatus("인증 오류");
@@ -66,7 +65,7 @@ export default function Page() {
           const verifyType = allowedTypes.has(typeParam) ? (typeParam as any) : ("magiclink" as const);
           if (token_hash) {
             setStatus("이메일 링크 확인 중...");
-            const { error: verifyError } = await supabase.auth.verifyOtp({
+            const { error: verifyError } = await supabaseBrowser.auth.verifyOtp({
               type: verifyType,
               token_hash,
             } as any);
@@ -80,7 +79,7 @@ export default function Page() {
 
         // 3) Ensure session exists
         setStatus("세션 확인 중...");
-        const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
+        const { data: sessionData, error: sessionErr } = await supabaseBrowser.auth.getSession();
         if (sessionErr) {
           setErrorMessage(sessionErr.message || "세션 확인 중 오류가 발생했습니다.");
           setStatus("인증 오류");
@@ -97,7 +96,7 @@ export default function Page() {
         // 4) Onboarding checks
         setStatus("프로필 확인 중...");
         const userId = session.user.id;
-        const { data: profile, error: profileErr } = await supabase
+        const { data: profile, error: profileErr } = await supabaseBrowser
           .from("profiles")
           .select("id, user_id")
           .eq("user_id", userId)
@@ -116,7 +115,7 @@ export default function Page() {
         }
 
         setStatus("동의 상태 확인 중...");
-        const { data: consents, error: consentErr } = await supabase
+        const { data: consents, error: consentErr } = await supabaseBrowser
           .from("user_consents")
           .select("id")
           .eq("user_id", userId)
