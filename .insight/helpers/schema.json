@@ -1,1 +1,1051 @@
-{}
+{
+  "profiles": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL UNIQUE REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "display_name",
+      "type": "text NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "avatar_url",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "preferred_language",
+      "type": "language_code_enum NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "ui_theme",
+      "type": "ui_theme_enum NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "palette_name",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "user_consents": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "consent_type",
+      "type": "consent_type_enum NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "version",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "given_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "revoked_at",
+      "type": "timestamptz",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "documents": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "title",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "original_filename",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "file_type",
+      "type": "file_type_enum NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "mime_type",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "file_size_bytes",
+      "type": "integer NOT NULL CHECK",
+      "nullable": false
+    },
+    {
+      "name": "storage_bucket",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "storage_path",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "page_count",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "language",
+      "type": "language_code_enum DEFAULT",
+      "nullable": true
+    },
+    {
+      "name": "ocr_used",
+      "type": "boolean NOT NULL DEFAULT false",
+      "nullable": false
+    },
+    {
+      "name": "status",
+      "type": "document_status_enum NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "error_message",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "document_chunks": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "document_id",
+      "type": "uuid NOT NULL REFERENCES documents",
+      "nullable": false,
+      "foreign_key": {
+        "table": "documents",
+        "column": "id"
+      }
+    },
+    {
+      "name": "chunk_index",
+      "type": "integer NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "text",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "page_number",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "slide_number",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "char_start",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "char_end",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "tokens",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "chunk_embeddings": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "document_id",
+      "type": "uuid NOT NULL REFERENCES documents",
+      "nullable": false,
+      "foreign_key": {
+        "table": "documents",
+        "column": "id"
+      }
+    },
+    {
+      "name": "chunk_id",
+      "type": "uuid NOT NULL REFERENCES document_chunks",
+      "nullable": false,
+      "foreign_key": {
+        "table": "document_chunks",
+        "column": "id"
+      }
+    },
+    {
+      "name": "embedding",
+      "type": "vector(1536) NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "embedding_model",
+      "type": "text NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "embedding_dim",
+      "type": "smallint NOT NULL DEFAULT 1536",
+      "nullable": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "summaries": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "document_id",
+      "type": "uuid NOT NULL REFERENCES documents",
+      "nullable": false,
+      "foreign_key": {
+        "table": "documents",
+        "column": "id"
+      }
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "scope",
+      "type": "summary_scope_enum NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "length",
+      "type": "summary_length_enum NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "section_label",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "page_from",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "page_to",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "content",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "jobs": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "document_id",
+      "type": "uuid REFERENCES documents",
+      "nullable": true,
+      "foreign_key": {
+        "table": "documents",
+        "column": "id"
+      }
+    },
+    {
+      "name": "job_type",
+      "type": "job_type_enum NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "status",
+      "type": "job_status_enum NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "priority",
+      "type": "smallint NOT NULL DEFAULT 0",
+      "nullable": false
+    },
+    {
+      "name": "attempts",
+      "type": "integer NOT NULL DEFAULT 0",
+      "nullable": false
+    },
+    {
+      "name": "max_attempts",
+      "type": "integer NOT NULL DEFAULT 3",
+      "nullable": false
+    },
+    {
+      "name": "last_error",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "payload",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "result",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "run_after",
+      "type": "timestamptz",
+      "nullable": true
+    },
+    {
+      "name": "started_at",
+      "type": "timestamptz",
+      "nullable": true
+    },
+    {
+      "name": "finished_at",
+      "type": "timestamptz",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "quiz_sets": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "document_id",
+      "type": "uuid REFERENCES documents",
+      "nullable": true,
+      "foreign_key": {
+        "table": "documents",
+        "column": "id"
+      }
+    },
+    {
+      "name": "type",
+      "type": "quiz_set_type_enum NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "title",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "source_scope",
+      "type": "summary_scope_enum DEFAULT",
+      "nullable": true
+    },
+    {
+      "name": "difficulty",
+      "type": "difficulty_enum DEFAULT",
+      "nullable": true
+    },
+    {
+      "name": "created_by_job_id",
+      "type": "uuid REFERENCES jobs",
+      "nullable": true,
+      "foreign_key": {
+        "table": "jobs",
+        "column": "id"
+      }
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "quiz_questions": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "quiz_set_id",
+      "type": "uuid NOT NULL REFERENCES quiz_sets",
+      "nullable": false,
+      "foreign_key": {
+        "table": "quiz_sets",
+        "column": "id"
+      }
+    },
+    {
+      "name": "question_type",
+      "type": "question_type_enum NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "prompt",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "options",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "correct_answer",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "explanation",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "difficulty",
+      "type": "difficulty_enum",
+      "nullable": true
+    },
+    {
+      "name": "chunk_id",
+      "type": "uuid REFERENCES document_chunks",
+      "nullable": true,
+      "foreign_key": {
+        "table": "document_chunks",
+        "column": "id"
+      }
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "quiz_attempts": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "quiz_set_id",
+      "type": "uuid NOT NULL REFERENCES quiz_sets",
+      "nullable": false,
+      "foreign_key": {
+        "table": "quiz_sets",
+        "column": "id"
+      }
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "started_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "completed_at",
+      "type": "timestamptz",
+      "nullable": true
+    },
+    {
+      "name": "score",
+      "type": "numeric(5,2)",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "question_attempts": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "quiz_attempt_id",
+      "type": "uuid NOT NULL REFERENCES quiz_attempts",
+      "nullable": false,
+      "foreign_key": {
+        "table": "quiz_attempts",
+        "column": "id"
+      }
+    },
+    {
+      "name": "question_id",
+      "type": "uuid NOT NULL REFERENCES quiz_questions",
+      "nullable": false,
+      "foreign_key": {
+        "table": "quiz_questions",
+        "column": "id"
+      }
+    },
+    {
+      "name": "user_answer",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "is_correct",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "score",
+      "type": "numeric(5,2)",
+      "nullable": true
+    },
+    {
+      "name": "responded_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "chat_sessions": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "document_id",
+      "type": "uuid REFERENCES documents",
+      "nullable": true,
+      "foreign_key": {
+        "table": "documents",
+        "column": "id"
+      }
+    },
+    {
+      "name": "title",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "chat_messages": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "session_id",
+      "type": "uuid NOT NULL REFERENCES chat_sessions",
+      "nullable": false,
+      "foreign_key": {
+        "table": "chat_sessions",
+        "column": "id"
+      }
+    },
+    {
+      "name": "user_id",
+      "type": "uuid REFERENCES auth",
+      "nullable": true
+    },
+    {
+      "name": "role",
+      "type": "chat_role_enum NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "content",
+      "type": "text NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "tokens_in",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "tokens_out",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "chat_message_citations": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "message_id",
+      "type": "uuid NOT NULL REFERENCES chat_messages",
+      "nullable": false,
+      "foreign_key": {
+        "table": "chat_messages",
+        "column": "id"
+      }
+    },
+    {
+      "name": "chunk_id",
+      "type": "uuid NOT NULL REFERENCES document_chunks",
+      "nullable": false,
+      "foreign_key": {
+        "table": "document_chunks",
+        "column": "id"
+      }
+    },
+    {
+      "name": "similarity",
+      "type": "double precision",
+      "nullable": true
+    },
+    {
+      "name": "start_offset",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "end_offset",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "srs_cards": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "origin_type",
+      "type": "srs_origin_type_enum NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "origin_id",
+      "type": "uuid NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "document_id",
+      "type": "uuid REFERENCES documents",
+      "nullable": true,
+      "foreign_key": {
+        "table": "documents",
+        "column": "id"
+      }
+    },
+    {
+      "name": "quiz_question_id",
+      "type": "uuid REFERENCES quiz_questions",
+      "nullable": true,
+      "foreign_key": {
+        "table": "quiz_questions",
+        "column": "id"
+      }
+    },
+    {
+      "name": "chunk_id",
+      "type": "uuid REFERENCES document_chunks",
+      "nullable": true,
+      "foreign_key": {
+        "table": "document_chunks",
+        "column": "id"
+      }
+    },
+    {
+      "name": "due_at",
+      "type": "timestamptz NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "last_reviewed_at",
+      "type": "timestamptz",
+      "nullable": true
+    },
+    {
+      "name": "interval_days",
+      "type": "integer NOT NULL DEFAULT 0",
+      "nullable": false
+    },
+    {
+      "name": "ease_factor",
+      "type": "numeric(4,2) NOT NULL DEFAULT 2",
+      "nullable": false
+    },
+    {
+      "name": "repetitions",
+      "type": "integer NOT NULL DEFAULT 0",
+      "nullable": false
+    },
+    {
+      "name": "status",
+      "type": "srs_card_status_enum NOT NULL DEFAULT",
+      "nullable": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "srs_reviews": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "card_id",
+      "type": "uuid NOT NULL REFERENCES srs_cards",
+      "nullable": false,
+      "foreign_key": {
+        "table": "srs_cards",
+        "column": "id"
+      }
+    },
+    {
+      "name": "reviewed_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "quality",
+      "type": "smallint NOT NULL CHECK",
+      "nullable": false
+    },
+    {
+      "name": "previous_interval_days",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "new_interval_days",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "previous_ease_factor",
+      "type": "numeric(4,2)",
+      "nullable": true
+    },
+    {
+      "name": "new_ease_factor",
+      "type": "numeric(4,2)",
+      "nullable": true
+    },
+    {
+      "name": "previous_repetitions",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "new_repetitions",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ],
+  "usage_events": [
+    {
+      "name": "id",
+      "type": "uuid PRIMARY KEY DEFAULT gen_random_uuid",
+      "nullable": false,
+      "primary_key": true
+    },
+    {
+      "name": "user_id",
+      "type": "uuid NOT NULL REFERENCES auth",
+      "nullable": false
+    },
+    {
+      "name": "related_document_id",
+      "type": "uuid REFERENCES documents",
+      "nullable": true,
+      "foreign_key": {
+        "table": "documents",
+        "column": "id"
+      }
+    },
+    {
+      "name": "related_job_id",
+      "type": "uuid REFERENCES jobs",
+      "nullable": true,
+      "foreign_key": {
+        "table": "jobs",
+        "column": "id"
+      }
+    },
+    {
+      "name": "event_type",
+      "type": "usage_event_type_enum NOT NULL",
+      "nullable": false
+    },
+    {
+      "name": "provider",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "model",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "tokens_input",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "tokens_output",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "unit_cost_usd",
+      "type": "numeric(10,6)",
+      "nullable": true
+    },
+    {
+      "name": "total_cost_usd",
+      "type": "numeric(12,6)",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "occurred_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz NOT NULL DEFAULT now",
+      "nullable": false
+    }
+  ]
+}

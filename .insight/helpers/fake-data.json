@@ -1,207 +1,491 @@
 {
-  "users": [
+  "profiles": [
     {
-      "id": "user-1",
-      "email": "alice.kim@example.com",
-      "name": "Alice Kim",
-      "created_at": "2024-06-01T08:30:00.000Z"
+      "id": "11111111-1111-1111-1111-111111111111",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "display_name": "Jihyun Kim",
+      "avatar_url": "https://example.com/avatars/jihyun.png",
+      "preferred_language": "ko",
+      "ui_theme": "light",
+      "palette_name": "poiima-default",
+      "created_at": "2024-06-01T08:30:00.000Z",
+      "updated_at": "2024-06-01T08:30:00.000Z"
     },
     {
-      "id": "user-2",
-      "email": "bob.lee@example.com",
-      "name": "Bob Lee",
-      "created_at": "2024-06-01T09:15:00.000Z"
+      "id": "22222222-2222-2222-2222-222222222222",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "display_name": "Minsoo Park",
+      "avatar_url": null,
+      "preferred_language": "ko",
+      "ui_theme": "dark",
+      "palette_name": "poiima-default",
+      "created_at": "2024-06-02T09:15:00.000Z",
+      "updated_at": "2024-06-02T09:15:00.000Z"
     },
     {
-      "id": "user-3",
-      "email": "charlie.park@example.com",
-      "name": "Charlie Park",
-      "created_at": "2024-06-01T10:00:00.000Z"
+      "id": "33333333-3333-3333-3333-333333333333",
+      "user_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "display_name": "Eunji Lee",
+      "avatar_url": "https://example.com/avatars/eunji.png",
+      "preferred_language": "ko",
+      "ui_theme": "light",
+      "palette_name": null,
+      "created_at": "2024-06-03T10:00:00.000Z",
+      "updated_at": "2024-06-03T10:00:00.000Z"
     },
     {
-      "id": "user-4",
-      "email": "dana.choi@example.com",
-      "name": "Dana Choi",
-      "created_at": "2024-06-01T10:45:00.000Z"
+      "id": "44444444-4444-4444-4444-444444444444",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "display_name": "Hyejin Choi",
+      "avatar_url": "https://example.com/avatars/hyejin.png",
+      "preferred_language": "ko",
+      "ui_theme": "dark",
+      "palette_name": "poiima-default",
+      "created_at": "2024-06-04T11:45:00.000Z",
+      "updated_at": "2024-06-04T11:45:00.000Z"
     }
   ],
-  "organizations": [
+  "user_consents": [
     {
-      "id": "org-1",
-      "name": "EduTech Corp",
-      "created_at": "2024-05-20T07:00:00.000Z"
+      "id": "55555555-5555-5555-5555-555555555555",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "consent_type": "terms_of_service",
+      "version": "2024-05",
+      "given_at": "2024-06-01T08:30:00.000Z",
+      "revoked_at": null,
+      "created_at": "2024-06-01T08:30:00.000Z",
+      "updated_at": "2024-06-01T08:30:00.000Z"
     },
     {
-      "id": "org-2",
-      "name": "BizMeet Solutions",
-      "created_at": "2024-05-22T07:30:00.000Z"
+      "id": "66666666-6666-6666-6666-666666666666",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "consent_type": "privacy_policy",
+      "version": "2024-05",
+      "given_at": "2024-06-02T09:15:00.000Z",
+      "revoked_at": null,
+      "created_at": "2024-06-02T09:15:00.000Z",
+      "updated_at": "2024-06-02T09:15:00.000Z"
+    },
+    {
+      "id": "77777777-7777-7777-7777-777777777777",
+      "user_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "consent_type": "terms_of_service",
+      "version": "2024-05",
+      "given_at": "2024-06-03T10:00:00.000Z",
+      "revoked_at": null,
+      "created_at": "2024-06-03T10:00:00.000Z",
+      "updated_at": "2024-06-03T10:00:00.000Z"
+    },
+    {
+      "id": "88888888-8888-8888-8888-888888888888",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "consent_type": "privacy_policy",
+      "version": "2024-05",
+      "given_at": "2024-06-04T11:45:00.000Z",
+      "revoked_at": null,
+      "created_at": "2024-06-04T11:45:00.000Z",
+      "updated_at": "2024-06-04T11:45:00.000Z"
     }
   ],
-  "sessions": [
+  "documents": [
     {
-      "id": "session-1",
-      "organization_id": "org-1",
-      "title": "2024 AI Seminar",
-      "start_time": "2024-06-10T14:00:00.000Z",
-      "end_time": "2024-06-10T15:30:00.000Z",
-      "created_by": "user-1"
+      "id": "99999999-9999-9999-9999-999999999999",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "title": "Introduction to Korean History",
+      "original_filename": "korean_history.pdf",
+      "file_type": "pdf",
+      "mime_type": "application/pdf",
+      "file_size_bytes": 1543210,
+      "storage_bucket": "user-uploads",
+      "storage_path": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/korean_history.pdf",
+      "page_count": 30,
+      "language": "ko",
+      "ocr_used": false,
+      "status": "processed",
+      "error_message": null,
+      "created_at": "2024-06-01T09:00:00.000Z",
+      "updated_at": "2024-06-01T09:30:00.000Z"
     },
     {
-      "id": "session-2",
-      "organization_id": "org-2",
-      "title": "Quarterly Business Review",
-      "start_time": "2024-06-11T09:00:00.000Z",
-      "end_time": "2024-06-11T11:00:00.000Z",
-      "created_by": "user-2"
+      "id": "aaaaaaaa-0000-0000-0000-000000000000",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "title": "Basic English Grammar",
+      "original_filename": "english_grammar.docx",
+      "file_type": "docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_size_bytes": 2800000,
+      "storage_bucket": "user-uploads",
+      "storage_path": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb/english_grammar.docx",
+      "page_count": 15,
+      "language": "en",
+      "ocr_used": false,
+      "status": "processed",
+      "error_message": null,
+      "created_at": "2024-06-02T10:20:00.000Z",
+      "updated_at": "2024-06-02T10:45:00.000Z"
     },
     {
-      "id": "session-3",
-      "organization_id": "org-1",
-      "title": "Faculty Meeting",
-      "start_time": "2024-06-12T13:00:00.000Z",
-      "end_time": "2024-06-12T14:00:00.000Z",
-      "created_by": "user-3"
+      "id": "bbbbbbbb-1111-1111-1111-111111111111",
+      "user_id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "title": "Physics Lecture Slides",
+      "original_filename": "physics_ppt.pptx",
+      "file_type": "pptx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "file_size_bytes": 1200000,
+      "storage_bucket": "user-uploads",
+      "storage_path": "cccccccc-cccc-cccc-cccc-cccccccccccc/physics_ppt.pptx",
+      "page_count": 10,
+      "language": "en",
+      "ocr_used": false,
+      "status": "processed",
+      "error_message": null,
+      "created_at": "2024-06-03T11:40:00.000Z",
+      "updated_at": "2024-06-03T12:15:00.000Z"
+    },
+    {
+      "id": "cccccccc-2222-2222-2222-222222222222",
+      "user_id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "title": "Korean Vocabulary List",
+      "original_filename": "vocab_list.txt",
+      "file_type": "txt",
+      "mime_type": "text/plain",
+      "file_size_bytes": 50000,
+      "storage_bucket": "user-uploads",
+      "storage_path": "dddddddd-dddd-dddd-dddd-dddddddddddd/vocab_list.txt",
+      "page_count": null,
+      "language": "ko",
+      "ocr_used": false,
+      "status": "processed",
+      "error_message": null,
+      "created_at": "2024-06-04T12:50:00.000Z",
+      "updated_at": "2024-06-04T13:10:00.000Z"
     }
   ],
-  "recordings": [
+  "document_chunks": [
     {
-      "id": "rec-1",
-      "session_id": "session-1",
-      "user_id": "user-1",
-      "file_path": "recordings/session-1/rec1.mp3",
-      "duration_seconds": 5400,
-      "created_at": "2024-06-10T15:31:00.000Z"
+      "id": "dddddddd-3333-3333-3333-333333333333",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "chunk_index": 0,
+      "text": "한국 역사의 개요 및 주요 사건 소개.",
+      "page_number": 1,
+      "slide_number": null,
+      "char_start": 0,
+      "char_end": 150,
+      "tokens": 30,
+      "created_at": "2024-06-01T09:01:00.000Z",
+      "updated_at": "2024-06-01T09:01:00.000Z"
     },
     {
-      "id": "rec-2",
-      "session_id": "session-2",
-      "user_id": "user-2",
-      "file_path": "recordings/session-2/rec2.mp3",
-      "duration_seconds": 7200,
-      "created_at": "2024-06-11T11:01:00.000Z"
+      "id": "eeeeeeee-4444-4444-4444-444444444444",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "chunk_index": 1,
+      "text": "조선 왕조의 성립과 발전 과정을 다룬다.",
+      "page_number": 2,
+      "slide_number": null,
+      "char_start": 151,
+      "char_end": 320,
+      "tokens": 40,
+      "created_at": "2024-06-01T09:02:00.000Z",
+      "updated_at": "2024-06-01T09:02:00.000Z"
     },
     {
-      "id": "rec-3",
-      "session_id": "session-3",
-      "user_id": "user-3",
-      "file_path": "recordings/session-3/rec3.mp3",
-      "duration_seconds": 3600,
-      "created_at": "2024-06-12T14:01:00.000Z"
+      "id": "ffffffff-5555-5555-5555-555555555555",
+      "document_id": "aaaaaaaa-0000-0000-0000-000000000000",
+      "chunk_index": 0,
+      "text": "English grammar is the set of structural rules that dictate the composition of clauses, phrases, and words in the English language.",
+      "page_number": 1,
+      "slide_number": null,
+      "char_start": 0,
+      "char_end": 200,
+      "tokens": 50,
+      "created_at": "2024-06-02T10:21:00.000Z",
+      "updated_at": "2024-06-02T10:21:00.000Z"
+    },
+    {
+      "id": "11111111-6666-6666-6666-666666666666",
+      "document_id": "bbbbbbbb-1111-1111-1111-111111111111",
+      "chunk_index": 0,
+      "text": "Newton's Laws of motion explained with examples.",
+      "page_number": 1,
+      "slide_number": 1,
+      "char_start": 0,
+      "char_end": 100,
+      "tokens": 25,
+      "created_at": "2024-06-03T11:41:00.000Z",
+      "updated_at": "2024-06-03T11:41:00.000Z"
     }
   ],
-  "transcripts": [
+  "chunk_embeddings": [
     {
-      "id": "trans-1",
-      "recording_id": "rec-1",
-      "speaker_id": "sp-1",
-      "start_time": "2024-06-10T14:00:00.000Z",
-      "end_time": "2024-06-10T14:05:00.000Z",
-      "text": "안녕하세요, 오늘 AI 세미나에 오신 것을 환영합니다."
+      "id": "12121212-7777-7777-7777-777777777777",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "chunk_id": "dddddddd-3333-3333-3333-333333333333",
+      "embedding": {},
+      "embedding_model": "openai/text-embedding-ada-002",
+      "embedding_dim": 1536,
+      "created_at": "2024-06-01T09:05:00.000Z",
+      "updated_at": "2024-06-01T09:05:00.000Z"
     },
     {
-      "id": "trans-2",
-      "recording_id": "rec-1",
-      "speaker_id": "sp-2",
-      "start_time": "2024-06-10T14:05:00.000Z",
-      "end_time": "2024-06-10T14:10:00.000Z",
-      "text": "오늘 저는 최신 기계 학습 동향에 대해 말씀드리겠습니다."
+      "id": "13131313-8888-8888-8888-888888888888",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "chunk_id": "eeeeeeee-4444-4444-4444-444444444444",
+      "embedding": {},
+      "embedding_model": "openai/text-embedding-ada-002",
+      "embedding_dim": 1536,
+      "created_at": "2024-06-01T09:06:00.000Z",
+      "updated_at": "2024-06-01T09:06:00.000Z"
     },
     {
-      "id": "trans-3",
-      "recording_id": "rec-2",
-      "speaker_id": "sp-3",
-      "start_time": "2024-06-11T09:00:00.000Z",
-      "end_time": "2024-06-11T09:15:00.000Z",
-      "text": "이번 분기 성과 보고서입니다."
-    },
-    {
-      "id": "trans-4",
-      "recording_id": "rec-3",
-      "speaker_id": "sp-4",
-      "start_time": "2024-06-12T13:00:00.000Z",
-      "end_time": "2024-06-12T13:10:00.000Z",
-      "text": "교수님들, 이번 학기 학사 일정에 대해 논의하겠습니다."
-    }
-  ],
-  "speakers": [
-    {
-      "id": "sp-1",
-      "session_id": "session-1",
-      "name": "Professor Kim"
-    },
-    {
-      "id": "sp-2",
-      "session_id": "session-1",
-      "name": "Dr. Lee"
-    },
-    {
-      "id": "sp-3",
-      "session_id": "session-2",
-      "name": "Manager Choi"
-    },
-    {
-      "id": "sp-4",
-      "session_id": "session-3",
-      "name": "Dean Park"
-    }
-  ],
-  "highlights": [
-    {
-      "id": "hl-1",
-      "session_id": "session-1",
-      "user_id": "user-1",
-      "timestamp": "2024-06-10T14:02:30.000Z",
-      "content": "AI의 미래 전망에 대한 중요 발언"
-    },
-    {
-      "id": "hl-2",
-      "session_id": "session-1",
-      "user_id": "user-2",
-      "timestamp": "2024-06-10T14:07:10.000Z",
-      "content": "기계 학습 모델 평가 방법 설명"
-    },
-    {
-      "id": "hl-3",
-      "session_id": "session-2",
-      "user_id": "user-2",
-      "timestamp": "2024-06-11T09:05:00.000Z",
-      "content": "매출 증가 전략 요약"
-    },
-    {
-      "id": "hl-4",
-      "session_id": "session-3",
-      "user_id": "user-3",
-      "timestamp": "2024-06-12T13:05:00.000Z",
-      "content": "학사 일정 변경 사항 안내"
+      "id": "14141414-9999-9999-9999-999999999999",
+      "document_id": "aaaaaaaa-0000-0000-0000-000000000000",
+      "chunk_id": "ffffffff-5555-5555-5555-555555555555",
+      "embedding": {},
+      "embedding_model": "openai/text-embedding-ada-002",
+      "embedding_dim": 1536,
+      "created_at": "2024-06-02T10:22:00.000Z",
+      "updated_at": "2024-06-02T10:22:00.000Z"
     }
   ],
   "summaries": [
     {
-      "id": "sum-1",
-      "session_id": "session-1",
-      "generated_at": "2024-06-10T16:00:00.000Z",
-      "full_transcript": "전체 AI 세미나 전사본 포함 타임스탬프 및 화자 표기",
-      "highlight_summary": "중요 발언 및 기계 학습 모델 평가 방법 요약본"
+      "id": "15151515-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "scope": "document",
+      "length": "short",
+      "section_label": null,
+      "page_from": 1,
+      "page_to": 10,
+      "content": "한국 역사의 주요 사건들을 간략하게 요약함.",
+      "created_at": "2024-06-01T09:10:00.000Z",
+      "updated_at": "2024-06-01T09:10:00.000Z"
     },
     {
-      "id": "sum-2",
-      "session_id": "session-2",
-      "generated_at": "2024-06-11T12:00:00.000Z",
-      "full_transcript": "분기 사업 검토 전사 및 타임스탬프 포함",
-      "highlight_summary": "매출 증가 전략과 핵심 내용 요약"
+      "id": "16161616-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "document_id": "aaaaaaaa-0000-0000-0000-000000000000",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "scope": "document",
+      "length": "medium",
+      "section_label": null,
+      "page_from": 1,
+      "page_to": 15,
+      "content": "Basic English grammar concepts summarized.",
+      "created_at": "2024-06-02T10:50:00.000Z",
+      "updated_at": "2024-06-02T10:50:00.000Z"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "17171717-cccc-cccc-cccc-cccccccccccc",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "job_type": "embedding_generation",
+      "status": "completed",
+      "priority": 1,
+      "attempts": 1,
+      "max_attempts": 3,
+      "last_error": null,
+      "payload": {
+        "chunk_ids": [
+          "dddddddd-3333-3333-3333-333333333333"
+        ]
+      },
+      "result": {
+        "success": true
+      },
+      "run_after": "2024-06-01T09:05:00.000Z",
+      "started_at": "2024-06-01T09:05:00.000Z",
+      "finished_at": "2024-06-01T09:10:00.000Z",
+      "created_at": "2024-06-01T09:04:00.000Z",
+      "updated_at": "2024-06-01T09:10:00.000Z"
     },
     {
-      "id": "sum-3",
-      "session_id": "session-3",
-      "generated_at": "2024-06-12T15:00:00.000Z",
-      "full_transcript": "교수진 미팅 전체 전사 내용",
-      "highlight_summary": "학사 일정 변경 및 주요 안내 내용 요약"
+      "id": "18181818-dddd-dddd-dddd-dddddddddddd",
+      "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "document_id": "aaaaaaaa-0000-0000-0000-000000000000",
+      "job_type": "quiz_generation",
+      "status": "pending",
+      "priority": 2,
+      "attempts": 0,
+      "max_attempts": 3,
+      "last_error": null,
+      "payload": {
+        "document_id": "aaaaaaaa-0000-0000-0000-000000000000"
+      },
+      "result": null,
+      "run_after": null,
+      "started_at": null,
+      "finished_at": null,
+      "created_at": "2024-06-02T10:50:00.000Z",
+      "updated_at": "2024-06-02T10:50:00.000Z"
+    }
+  ],
+  "quiz_sets": [
+    {
+      "id": "19191919-eeee-eeee-eeee-eeeeeeeeeeee",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "type": "auto_generated",
+      "title": "Korean History Basics Quiz",
+      "source_scope": "document",
+      "difficulty": "easy",
+      "created_by_job_id": "17171717-cccc-cccc-cccc-cccccccccccc",
+      "created_at": "2024-06-01T09:15:00.000Z",
+      "updated_at": "2024-06-01T09:15:00.000Z"
+    }
+  ],
+  "quiz_questions": [
+    {
+      "id": "20202020-ffff-ffff-ffff-ffffffffffff",
+      "quiz_set_id": "19191919-eeee-eeee-eeee-eeeeeeeeeeee",
+      "question_type": "multiple_choice",
+      "prompt": "조선 왕조가 시작된 연도는 언제인가요?",
+      "options": [
+        "1392년",
+        "1410년",
+        "1450년",
+        "1500년"
+      ],
+      "correct_answer": "1392년",
+      "explanation": "조선 왕조는 1392년에 시작되었습니다.",
+      "difficulty": "easy",
+      "chunk_id": "eeeeeeee-4444-4444-4444-444444444444",
+      "created_at": "2024-06-01T09:16:00.000Z",
+      "updated_at": "2024-06-01T09:16:00.000Z"
+    }
+  ],
+  "quiz_attempts": [
+    {
+      "id": "21212121-1111-1111-1111-111111111111",
+      "quiz_set_id": "19191919-eeee-eeee-eeee-eeeeeeeeeeee",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "started_at": "2024-06-01T09:20:00.000Z",
+      "completed_at": "2024-06-01T09:25:00.000Z",
+      "score": 85.5,
+      "created_at": "2024-06-01T09:20:00.000Z",
+      "updated_at": "2024-06-01T09:25:00.000Z"
+    }
+  ],
+  "question_attempts": [
+    {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "quiz_attempt_id": "21212121-1111-1111-1111-111111111111",
+      "question_id": "20202020-ffff-ffff-ffff-ffffffffffff",
+      "user_answer": "1392년",
+      "is_correct": true,
+      "score": 10,
+      "responded_at": "2024-06-01T09:21:00.000Z",
+      "created_at": "2024-06-01T09:21:00.000Z",
+      "updated_at": "2024-06-01T09:21:00.000Z"
+    }
+  ],
+  "chat_sessions": [
+    {
+      "id": "23232323-3333-3333-3333-333333333333",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "title": "Korean History Discussion",
+      "created_at": "2024-06-01T09:30:00.000Z",
+      "updated_at": "2024-06-01T09:30:00.000Z"
+    }
+  ],
+  "chat_messages": [
+    {
+      "id": "24242424-4444-4444-4444-444444444444",
+      "session_id": "23232323-3333-3333-3333-333333333333",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "role": "user",
+      "content": "이 조선 왕조에 대해 더 알려주세요.",
+      "tokens_in": 10,
+      "tokens_out": 50,
+      "created_at": "2024-06-01T09:31:00.000Z",
+      "updated_at": "2024-06-01T09:31:00.000Z"
+    },
+    {
+      "id": "25252525-5555-5555-5555-555555555555",
+      "session_id": "23232323-3333-3333-3333-333333333333",
+      "user_id": null,
+      "role": "assistant",
+      "content": "조선 왕조는 1392년에 이성계가 건국했으며, 중요한 역사적 사건들은 다음과 같습니다...",
+      "tokens_in": 50,
+      "tokens_out": 100,
+      "created_at": "2024-06-01T09:31:30.000Z",
+      "updated_at": "2024-06-01T09:31:30.000Z"
+    }
+  ],
+  "chat_message_citations": [
+    {
+      "id": "26262626-6666-6666-6666-666666666666",
+      "message_id": "25252525-5555-5555-5555-555555555555",
+      "chunk_id": "dddddddd-3333-3333-3333-333333333333",
+      "similarity": 0.95,
+      "start_offset": 0,
+      "end_offset": 150,
+      "created_at": "2024-06-01T09:31:35.000Z",
+      "updated_at": "2024-06-01T09:31:35.000Z"
+    }
+  ],
+  "srs_cards": [
+    {
+      "id": "27272727-7777-7777-7777-777777777777",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "origin_type": "quiz_question",
+      "origin_id": "20202020-ffff-ffff-ffff-ffffffffffff",
+      "document_id": "99999999-9999-9999-9999-999999999999",
+      "quiz_question_id": "20202020-ffff-ffff-ffff-ffffffffffff",
+      "chunk_id": "eeeeeeee-4444-4444-4444-444444444444",
+      "due_at": "2024-06-10T09:00:00.000Z",
+      "last_reviewed_at": "2024-06-01T09:25:00.000Z",
+      "interval_days": 3,
+      "ease_factor": 2.5,
+      "repetitions": 1,
+      "status": "learning",
+      "created_at": "2024-06-01T09:26:00.000Z",
+      "updated_at": "2024-06-01T09:26:00.000Z"
+    }
+  ],
+  "srs_reviews": [
+    {
+      "id": "28282828-8888-8888-8888-888888888888",
+      "card_id": "27272727-7777-7777-7777-777777777777",
+      "reviewed_at": "2024-06-01T09:25:00.000Z",
+      "quality": 4,
+      "previous_interval_days": 2,
+      "new_interval_days": 3,
+      "previous_ease_factor": 2.4,
+      "new_ease_factor": 2.5,
+      "previous_repetitions": 0,
+      "new_repetitions": 1,
+      "created_at": "2024-06-01T09:25:00.000Z",
+      "updated_at": "2024-06-01T09:25:00.000Z"
+    }
+  ],
+  "usage_events": [
+    {
+      "id": "29292929-9999-9999-9999-999999999999",
+      "user_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "related_document_id": "99999999-9999-9999-9999-999999999999",
+      "related_job_id": "17171717-cccc-cccc-cccc-cccccccccccc",
+      "event_type": "embedding_api_call",
+      "provider": "OpenAI",
+      "model": "text-embedding-ada-002",
+      "tokens_input": 1000,
+      "tokens_output": 1536,
+      "unit_cost_usd": 0.0004,
+      "total_cost_usd": 0.6154,
+      "metadata": {
+        "request_id": "req-1234"
+      },
+      "occurred_at": "2024-06-01T09:05:00.000Z",
+      "created_at": "2024-06-01T09:05:00.000Z",
+      "updated_at": "2024-06-01T09:05:00.000Z"
     }
   ],
   "session": {
     "user": {
-      "id": "user-1",
-      "email": "alice.kim@example.com"
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "email": "jihyun.kim@example.com"
     }
   }
 }

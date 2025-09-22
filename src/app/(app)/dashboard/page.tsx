@@ -2,504 +2,600 @@
 
 /**
  * CODE INSIGHT
- * This code's use case is to render the main dashboard page for authenticated users.
- * It focuses on quick actions (start session, ingest recordings, connect integrations),
- * shows recent sessions and imports (empty-friendly without DB calls),
- * and provides helpful navigation across the app. No database reads are performed
- * because schema is not declared here; only Supabase Auth is used for greeting.
+ * This code's use case is to render the main authenticated dashboard for poiima users.
+ * It provides progress stats, upcoming SRS reviews, recent activity, and quick actions.
+ * The page loads user-specific data from Supabase (client-side) and presents a sleek,
+ * responsive UI without header/footer/sidebar. This page is production-ready and
+ * optimized for clarity and usability on mobile and desktop.
  */
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/utils/supabase/client-browser";
 import { cn } from "@/utils/utils";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Separator } from "@/components/ui/separator";
 
-function IconChevronRight(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
-      <path d="M9 18l6-6-6-6" />
-    </svg>
-  );
+type UUID = string;
+
+type Profile = {
+  id: UUID;
+  user_id: UUID;
+  display_name: string | null;
+  avatar_url: string | null;
+};
+
+type DocumentRow = {
+  id: UUID;
+  user_id: UUID;
+  title: string;
+  status: string | null;
+  created_at: string;
+  page_count: number | null;
+};
+
+type SrsCardRow = {
+  id: UUID;
+  user_id: UUID;
+  document_id: UUID | null;
+  quiz_question_id: UUID | null;
+  chunk_id: UUID | null;
+  due_at: string; // ISO
+};
+
+type UsageEventRow = {
+  id: UUID;
+  user_id: UUID;
+  event_type: string;
+  related_document_id: UUID | null;
+  provider: string | null;
+  model: string | null;
+  total_cost_usd: string | number | null;
+  occurred_at: string; // ISO
+};
+
+type QuizAttemptRow = {
+  id: UUID;
+  user_id: UUID;
+  score: string | number | null;
+  started_at: string;
+  completed_at: string | null;
+};
+
+function formatNumber(n: number | null | undefined) {
+  if (n == null || Number.isNaN(n)) return "-";
+  return new Intl.NumberFormat().format(n);
 }
 
-function IconMic(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
-      <rect x="9" y="2" width="6" height="11" rx="3" />
-      <path d="M5 10v2a7 7 0 0014 0v-2" />
-      <path d="M12 19v3" />
-    </svg>
-  );
+function formatPercent(n: number | null | undefined) {
+  if (n == null || Number.isNaN(n)) return "-";
+  return `${Math.round(n)}%`;
 }
 
-function IconUpload(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-      <path d="M7 10l5-5 5 5" />
-      <path d="M12 15V5" />
-    </svg>
-  );
+function formatDateTime(iso: string | null | undefined) {
+  if (!iso) return "-";
+  const d = new Date(iso);
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(d);
 }
 
-function IconPlug(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
-      <path d="M6 3v6" />
-      <path d="M18 3v6" />
-      <path d="M6 8h12" />
-      <path d="M7 16h10a4 4 0 004-4v-1H3v1a4 4 0 004 4z" />
-    </svg>
-  );
-}
-
-function IconSparkles(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
-      <path d="M5 3l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z" transform="translate(7 3) scale(0.7)" />
-      <path d="M12 3l1.5 3 3 1.5-3 1.5L12 12l-1.5-3L7.5 7.5 10.5 6 12 3z" />
-    </svg>
-  );
-}
-
-function IconClock(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 6v6l4 2" />
-    </svg>
-  );
-}
-
-function IconZoom(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <rect x="2" y="6" width="12" height="10" rx="2" />
-      <path d="M18 8l4-1v10l-4-1z" />
-    </svg>
-  );
-}
-
-function IconTeams(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <circle cx="8.5" cy="8.5" r="2.5" />
-      <rect x="3" y="12" width="11" height="7" rx="2" />
-      <circle cx="17.5" cy="7.5" r="2.5" />
-    </svg>
-  );
+function timeFromNow(iso: string) {
+  const now = new Date();
+  const target = new Date(iso);
+  const diffMs = target.getTime() - now.getTime();
+  const past = diffMs <= 0;
+  const abs = Math.abs(diffMs);
+  const mins = Math.round(abs / 60000);
+  if (mins < 1) return past ? "지금" : "곧";
+  if (mins < 60) return `${mins}분 ${past ? "지남" : "후"}`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}시간 ${past ? "지남" : "후"}`;
+  const days = Math.round(hours / 24);
+  return `${days}일 ${past ? "지남" : "후"}`;
 }
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [userName, setUserName] = useState<string | null>(null);
-  const [online, setOnline] = useState<boolean>(true);
-  const [now, setNow] = useState<Date>(new Date());
+  const supabase = useMemo(() => supabaseBrowser(), []);
 
-  const [recentSessionIds, setRecentSessionIds] = useState<string[]>([]);
-  const [lastSessionId, setLastSessionId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    supabaseBrowser.auth.getUser().then(({ data }) => {
-      const name = data.user?.user_metadata?.name || data.user?.email || null;
-      setUserName(name);
-    });
-  }, []);
+  const [userId, setUserId] = useState<UUID | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
-  useEffect(() => {
-    const updateOnline = () => setOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
-    updateOnline();
-    window.addEventListener("online", updateOnline);
-    window.addEventListener("offline", updateOnline);
-    return () => {
-      window.removeEventListener("online", updateOnline);
-      window.removeEventListener("offline", updateOnline);
-    };
-  }, []);
+  // Stats
+  const [docCount, setDocCount] = useState<number>(0);
+  const [quizAttemptCount, setQuizAttemptCount] = useState<number>(0);
+  const [quizAvgScore, setQuizAvgScore] = useState<number | null>(null);
+  const [dueNowCount, setDueNowCount] = useState<number>(0);
+  const [nextDueAt, setNextDueAt] = useState<string | null>(null);
 
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000 * 60);
-    return () => clearInterval(id);
-  }, []);
+  // Lists
+  const [recentDocs, setRecentDocs] = useState<DocumentRow[] | null>(null);
+  const [dueNowList, setDueNowList] = useState<SrsCardRow[] | null>(null);
+  const [upcomingList, setUpcomingList] = useState<SrsCardRow[] | null>(null);
+  const [recentEvents, setRecentEvents] = useState<UsageEventRow[] | null>(null);
+  const [docTitles, setDocTitles] = useState<Record<string, string>>({});
 
-  useEffect(() => {
+  const loadData = useCallback(async (uid: UUID) => {
+    setError(null);
+    setLoading(true);
     try {
-      const storedLast = localStorage.getItem("lastSessionId");
-      if (storedLast) setLastSessionId(storedLast);
-      const storedRecent = localStorage.getItem("recentSessionIds");
-      if (storedRecent) {
-        const parsed = JSON.parse(storedRecent);
-        if (Array.isArray(parsed)) setRecentSessionIds(parsed.slice(0, 6));
+      // Profile
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("id,user_id,display_name,avatar_url")
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (profileError) throw profileError;
+      if (profileData) setProfile(profileData as Profile);
+
+      // Stats: documents count
+      const { count: dCount, error: dErr } = await supabase
+        .from("documents")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", uid);
+      if (dErr) throw dErr;
+      setDocCount(dCount ?? 0);
+
+      // Stats: quiz attempts count
+      const { count: qaCount, error: qaErr } = await supabase
+        .from("quiz_attempts")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", uid);
+      if (qaErr) throw qaErr;
+      setQuizAttemptCount(qaCount ?? 0);
+
+      // Stats: quiz avg score (fetch subset for efficiency)
+      const { data: qaScores, error: qaScoresErr } = await supabase
+        .from("quiz_attempts")
+        .select("score")
+        .eq("user_id", uid)
+        .not("score", "is", null)
+        .order("started_at", { ascending: false })
+        .limit(1000);
+      if (qaScoresErr) throw qaScoresErr;
+      if (qaScores && qaScores.length > 0) {
+        const nums = qaScores
+          .map((r) => (typeof r.score === "string" ? parseFloat(r.score) : r.score))
+          .filter((n): n is number => typeof n === "number" && !Number.isNaN(n));
+        const avg = nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
+        setQuizAvgScore(avg !== null ? Math.max(0, Math.min(100, avg)) : null);
+      } else {
+        setQuizAvgScore(null);
       }
-    } catch {}
-  }, []);
+
+      const nowIso = new Date().toISOString();
+
+      // Stats: due now count
+      const { count: dueCount, error: dueErr } = await supabase
+        .from("srs_cards")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", uid)
+        .lte("due_at", nowIso);
+      if (dueErr) throw dueErr;
+      setDueNowCount(dueCount ?? 0);
+
+      // Stats: next due at
+      const { data: nextDue, error: nextErr } = await supabase
+        .from("srs_cards")
+        .select("due_at")
+        .eq("user_id", uid)
+        .gt("due_at", nowIso)
+        .order("due_at", { ascending: true })
+        .limit(1);
+      if (nextErr) throw nextErr;
+      setNextDueAt(nextDue && nextDue.length ? nextDue[0].due_at : null);
+
+      // Recent documents
+      const { data: rDocs, error: rDocsErr } = await supabase
+        .from("documents")
+        .select("id,user_id,title,status,created_at,page_count")
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (rDocsErr) throw rDocsErr;
+      setRecentDocs((rDocs as DocumentRow[]) || []);
+
+      // Due now list (top 5 by overdue)
+      const { data: dueList, error: dueListErr } = await supabase
+        .from("srs_cards")
+        .select("id,user_id,document_id,quiz_question_id,chunk_id,due_at")
+        .eq("user_id", uid)
+        .lte("due_at", nowIso)
+        .order("due_at", { ascending: true })
+        .limit(5);
+      if (dueListErr) throw dueListErr;
+      setDueNowList((dueList as SrsCardRow[]) || []);
+
+      // Upcoming list (next 5)
+      const { data: upList, error: upErr } = await supabase
+        .from("srs_cards")
+        .select("id,user_id,document_id,quiz_question_id,chunk_id,due_at")
+        .eq("user_id", uid)
+        .gt("due_at", nowIso)
+        .order("due_at", { ascending: true })
+        .limit(5);
+      if (upErr) throw upErr;
+      setUpcomingList((upList as SrsCardRow[]) || []);
+
+      // Recent usage events
+      const { data: events, error: eventsErr } = await supabase
+        .from("usage_events")
+        .select("id,user_id,event_type,related_document_id,provider,model,total_cost_usd,occurred_at")
+        .eq("user_id", uid)
+        .order("occurred_at", { ascending: false })
+        .limit(8);
+      if (eventsErr) throw eventsErr;
+      setRecentEvents((events as UsageEventRow[]) || []);
+
+      // Collect doc titles for cards and events
+      const docIds = new Set<string>();
+      for (const c of (dueList as SrsCardRow[]) || []) {
+        if (c.document_id) docIds.add(c.document_id);
+      }
+      for (const c of (upList as SrsCardRow[]) || []) {
+        if (c.document_id) docIds.add(c.document_id);
+      }
+      for (const ev of (events as UsageEventRow[]) || []) {
+        if (ev.related_document_id) docIds.add(ev.related_document_id);
+      }
+      if (docIds.size > 0) {
+        const { data: titles, error: titlesErr } = await supabase
+          .from("documents")
+          .select("id,title")
+          .in("id", Array.from(docIds));
+        if (titlesErr) throw titlesErr;
+        const map: Record<string, string> = {};
+        for (const t of titles || []) map[t.id] = t.title;
+        setDocTitles(map);
+      } else {
+        setDocTitles({});
+      }
+    } catch (e: any) {
+      setError(e?.message || "오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const {
+        data: { user },
+        error: userErr,
+      } = await supabase.auth.getUser();
+      if (userErr || !user) {
+        router.replace("/login?next=/dashboard");
+        return;
+      }
+      if (!mounted) return;
+      setUserId(user.id as UUID);
+      await loadData(user.id as UUID);
+    })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session?.user) {
+        router.replace("/login?next=/dashboard");
+      }
+    });
+
+    return () => {
+      mounted = false;
+      sub?.subscription.unsubscribe();
+    };
+  }, [router, supabase, loadData]);
 
   const greeting = useMemo(() => {
-    const hours = new Date().getHours();
-    if (hours < 12) return "좋은 아침";
-    if (hours < 18) return "좋은 오후";
-    return "좋은 저녁";
-  }, []);
+    const name = profile?.display_name?.trim();
+    return name && name.length > 0 ? `${name}님` : "학습자님";
+  }, [profile]);
 
-  const formattedNow = useMemo(() => {
-    try {
-      return new Intl.DateTimeFormat(undefined, {
-        dateStyle: "medium",
-        timeStyle: "short",
-      }).format(now);
-    } catch {
-      return now.toLocaleString();
-    }
-  }, [now]);
+  const handleRefresh = useCallback(() => {
+    if (userId) loadData(userId);
+  }, [loadData, userId]);
 
   return (
-    <main className="flex flex-col gap-6">
-      {!online && (
-        <Alert variant="destructive" className="border-destructive/30 bg-destructive/10 text-destructive">
-          <AlertTitle>오프라인 상태</AlertTitle>
-          <AlertDescription>인터넷 연결이 없어도 녹음은 가능합니다. 연결이 복구되면 자동으로 동기화됩니다.</AlertDescription>
+    <main className="w-full space-y-6">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">안녕하세요, {greeting}</h1>
+          <p className="text-muted-foreground mt-1">poiima 대시보드에서 학습 진행 상황과 다음 할 일을 확인하세요.</p>
+        </div>
+        <div className="flex gap-2">
+          <Link
+            href="/upload"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-primary-foreground shadow-sm transition hover:opacity-90"
+          >
+            파일 업로드
+          </Link>
+          <button
+            onClick={handleRefresh}
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+          >
+            새로고침
+          </button>
+        </div>
+      </section>
+
+      {error && (
+        <Alert variant="destructive" className="border-destructive/50 bg-destructive/5">
+          <AlertTitle>데이터를 불러오지 못했어요</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">{greeting}{userName ? `, ${userName}` : ""}</h1>
-            <p className="text-sm text-muted-foreground flex items-center gap-2">
-              <IconClock className="h-4 w-4" />
-              <span>{formattedNow}</span>
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/sessions/new" className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-primary-foreground shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-primary">
-              <IconMic className="h-4 w-4" />
-              새 세션 시작
-            </Link>
-            <Link href="/ingest" className="inline-flex items-center gap-2 rounded-lg bg-secondary px-4 py-2 text-secondary-foreground hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-secondary">
-              <IconUpload className="h-4 w-4" />
-              녹음 가져오기
-            </Link>
-            <Link href="/integrations" className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-accent-foreground hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-accent">
-              <IconPlug className="h-4 w-4" />
-              통합 설정
-            </Link>
-          </div>
-        </div>
-
-        <Separator className="my-6" />
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <a href="/sessions/new" className="group rounded-xl border border-border bg-muted/30 p-5 transition hover:bg-muted/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <IconMic className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="font-medium">실시간 전사 시작</p>
-                  <p className="text-sm text-muted-foreground">브라우저에서 마이크로 즉시 시작</p>
-                </div>
-              </div>
-              <IconChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5" />
-            </div>
-          </a>
-          <a href="/ingest/upload" className="group rounded-xl border border-border bg-muted/30 p-5 transition hover:bg-muted/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-chart-2/10 text-chart-2">
-                  <IconUpload className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="font-medium">파일 업로드</p>
-                  <p className="text-sm text-muted-foreground">Zoom/Teams 녹음 파일 처리</p>
-                </div>
-              </div>
-              <IconChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5" />
-            </div>
-          </a>
-          <a href="/integrations" className="group rounded-xl border border-border bg-muted/30 p-5 transition hover:bg-muted/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-chart-3/10 text-chart-3">
-                  <IconPlug className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="font-medium">Zoom / Teams 연동</p>
-                  <p className="text-sm text-muted-foreground">OAuth로 계정 연결</p>
-                </div>
-              </div>
-              <IconChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5" />
-            </div>
-          </a>
-        </div>
+      {/* Stats */}
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="학습자료"
+          primary={loading ? undefined : formatNumber(docCount)}
+          subtitle="업로드한 문서"
+          loading={loading}
+        />
+        <StatCard
+          title="퀴즈 시도"
+          primary={loading ? undefined : formatNumber(quizAttemptCount)}
+          subtitle="총 시도 수"
+          loading={loading}
+        />
+        <StatCard
+          title="평균 점수"
+          primary={loading ? undefined : formatPercent(quizAvgScore)}
+          subtitle="최근 시도 기준"
+          loading={loading}
+        />
+        <StatCard
+          title="복습 예정"
+          primary={loading ? undefined : formatNumber(dueNowCount)}
+          subtitle={nextDueAt ? `다음: ${timeFromNow(nextDueAt)}` : "다음 일정 준비중"}
+          loading={loading}
+        />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">최근 세션</h2>
-            <div className="flex items-center gap-3">
-              <Link href="/sessions" className="text-sm text-primary hover:underline">전체 보기</Link>
-              <Link href="/sessions/new" className="text-sm text-muted-foreground hover:underline">새 세션</Link>
-            </div>
-          </div>
+      {/* Quick Actions */}
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <QuickAction href="/upload" label="업로드" emoji="📤" description="PDF/DOCX 등 자료 추가" />
+        <QuickAction href="/documents" label="문서" emoji="📚" description="내 문서 관리" />
+        <QuickAction href="/reviews/session" label="복습 시작" emoji="🧠" description="SRS 세션 진행" />
+        <QuickAction href="/quizzes/adaptive" label="맞춤 퀴즈" emoji="🎯" description="약점 집중 퀴즈" />
+        <QuickAction href="/settings" label="설정" emoji="⚙️" description="환경 설정" />
+      </section>
 
-          {recentSessionIds.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center">
-              <p className="text-sm text-muted-foreground">아직 최근 세션이 없습니다.</p>
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-                <Link href="/sessions/new" className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:opacity-95">
-                  <IconMic className="h-4 w-4" />
-                  첫 세션 시작하기
-                </Link>
-                <Link href="/ingest" className="inline-flex items-center gap-2 rounded-md bg-secondary px-3 py-2 text-sm text-secondary-foreground hover:opacity-95">
-                  <IconUpload className="h-4 w-4" />
-                  녹음 가져오기
-                </Link>
-                <Link href="/onboarding" className="inline-flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm text-accent-foreground hover:opacity-95">
-                  <IconSparkles className="h-4 w-4" />
-                  온보딩 보기
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {recentSessionIds.map((id) => (
-                <a
-                  key={id}
-                  href={`/sessions/${encodeURIComponent(id)}`}
-                  className="group rounded-xl border border-border bg-card p-4 shadow-sm transition hover:bg-muted/50"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium">세션 {id.slice(0, 8)}</p>
-                      <p className="truncate text-sm text-muted-foreground">자세히 보기 및 요약</p>
-                    </div>
-                    <IconChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-0.5" />
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Upcoming Reviews */}
+        <div className="col-span-1 flex flex-col rounded-xl border border-border bg-card p-4 text-card-foreground">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium">오늘 복습</h2>
+            <Link href="/reviews" className="text-sm text-primary hover:underline">
+              전체 보기
+            </Link>
+          </div>
+          <Separator className="my-3" />
+          {loading ? (
+            <ListSkeleton rows={5} />
+          ) : dueNowList && dueNowList.length > 0 ? (
+            <ul className="space-y-3">
+              {dueNowList.map((c) => (
+                <li key={c.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-background px-3 py-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {c.document_id ? docTitles[c.document_id] || "문서 기반 카드" : "카드"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{formatDateTime(c.due_at)} • {timeFromNow(c.due_at)}</p>
                   </div>
-                  <Separator className="my-3" />
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>실시간/업로드</span>
-                    <span>상세</span>
-                  </div>
-                </a>
+                  {c.document_id ? (
+                    <Link
+                      href={`/documents/${c.document_id}`}
+                      className="ml-3 inline-flex shrink-0 items-center rounded-md border border-input bg-background px-2 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
+                    >
+                      문서
+                    </Link>
+                  ) : (
+                    <span className="ml-3 inline-flex shrink-0 select-none rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">일반</span>
+                  )}
+                </li>
               ))}
-            </div>
+            </ul>
+          ) : (
+            <EmptyState title="오늘 복습할 카드가 없어요" description="예정된 복습이 생기면 여기에서 안내해 드릴게요." />
           )}
 
-          <Collapsible defaultOpen>
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-muted-foreground">최근 공지</h3>
-              <CollapsibleTrigger asChild>
-                <button className="text-sm text-primary hover:underline">접기/펼치기</button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li className="rounded-md border border-border p-3">
-                  실시간 자막 성능 개선 및 하이라이트 단축키 추가. <Link href="/help" className="text-primary hover:underline">자세히</Link>
-                </li>
-                <li className="rounded-md border border-border p-3">
-                  Zoom/Teams 연결 안정성 개선. <Link href="/integrations" className="text-primary hover:underline">통합 설정</Link>
-                </li>
-              </ul>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-
-        <aside className="space-y-4">
-          <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">가져오기</h2>
-              <Link href="/imports" className="text-sm text-primary hover:underline">내 가져오기</Link>
-            </div>
-            <div className="rounded-lg border border-dashed border-border p-6 text-center">
-              <p className="text-sm text-muted-foreground">최근 가져오기가 없습니다.</p>
-              <Link href="/ingest/upload" className="mt-3 inline-flex items-center gap-2 rounded-md bg-secondary px-3 py-2 text-sm text-secondary-foreground hover:opacity-95">
-                <IconUpload className="h-4 w-4" /> 업로드 시작
-              </Link>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold">통합 상태</h2>
-            <div className="space-y-3">
-              <a href="/integrations/zoom" className="flex items-center justify-between rounded-lg border border-border p-3 transition hover:bg-muted/50">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 text-primary">
-                    <IconZoom className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <p className="font-medium">Zoom</p>
-                    <p className="text-xs text-muted-foreground">계정 연결 및 가져오기</p>
+          <Separator className="my-4" />
+          <h3 className="mb-2 text-sm font-medium">다가오는 복습</h3>
+          {loading ? (
+            <ListSkeleton rows={4} />
+          ) : upcomingList && upcomingList.length > 0 ? (
+            <ul className="space-y-3">
+              {upcomingList.map((c) => (
+                <li key={c.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-background px-3 py-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {c.document_id ? docTitles[c.document_id] || "문서 기반 카드" : "카드"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{formatDateTime(c.due_at)} • {timeFromNow(c.due_at)}</p>
                   </div>
-                </div>
-                <IconChevronRight className="h-5 w-5 text-muted-foreground" />
-              </a>
-              <a href="/integrations/teams" className="flex items-center justify-between rounded-lg border border-border p-3 transition hover:bg-muted/50">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-chart-3/10 text-chart-3">
-                    <IconTeams className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <p className="font-medium">Microsoft Teams</p>
-                    <p className="text-xs text-muted-foreground">계정 연결 및 가져오기</p>
+                  {c.document_id ? (
+                    <Link
+                      href={`/documents/${c.document_id}`}
+                      className="ml-3 inline-flex shrink-0 items-center rounded-md border border-input bg-background px-2 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
+                    >
+                      문서
+                    </Link>
+                  ) : (
+                    <span className="ml-3 inline-flex shrink-0 select-none rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">일반</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState title="예정된 복습이 없어요" description="문서 학습 또는 퀴즈를 진행하면 복습 카드가 생성됩니다." />
+          )}
+          <div className="mt-4 flex justify-end">
+            <Link
+              href="/reviews/session"
+              className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90"
+            >
+              지금 복습 시작
+            </Link>
+          </div>
+        </div>
+
+        {/* Recent Documents */}
+        <div className="col-span-1 flex flex-col rounded-xl border border-border bg-card p-4 text-card-foreground">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium">최근 문서</h2>
+            <Link href="/documents" className="text-sm text-primary hover:underline">
+              문서 관리
+            </Link>
+          </div>
+          <Separator className="my-3" />
+          {loading ? (
+            <ListSkeleton rows={5} />
+          ) : recentDocs && recentDocs.length > 0 ? (
+            <ul className="space-y-3">
+              {recentDocs.map((d) => (
+                <li key={d.id} className="flex items-center justify-between rounded-lg border border-border/60 bg-background px-3 py-2">
+                  <div className="min-w-0">
+                    <Link href={`/documents/${d.id}`} className="truncate text-sm font-medium hover:underline">
+                      {d.title}
+                    </Link>
+                    <p className="text-xs text-muted-foreground">{formatDateTime(d.created_at)} • 페이지 {d.page_count ?? "-"}</p>
                   </div>
-                </div>
-                <IconChevronRight className="h-5 w-5 text-muted-foreground" />
-              </a>
-            </div>
-            <Separator className="my-4" />
-            <div className="flex flex-wrap gap-2">
-              <Link href="/consent/new" className="inline-flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-xs text-accent-foreground">
-                녹음 동의 생성
-              </Link>
-              <Link href="/org/members" className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-xs">
-                조직 구성원
-              </Link>
-              <Link href="/settings/profile" className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-xs">
-                내 프로필
-              </Link>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <section className="rounded-xl border border-border bg-card p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">빠른 시작 가이드</h2>
-          <div className="flex items-center gap-3">
-            {lastSessionId && (
-              <Link href={`/sessions/${encodeURIComponent(lastSessionId)}`} className="text-sm text-primary hover:underline">
-                마지막 세션 열기
-              </Link>
-            )}
-            <Link href="/help" className="text-sm text-muted-foreground hover:underline">도움말</Link>
-          </div>
+                  <span className="ml-3 shrink-0 rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">{d.status ?? "처리중"}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState title="아직 업로드한 문서가 없어요" description="지금 문서를 업로드하고 학습을 시작해 보세요." ctaHref="/upload" ctaLabel="업로드" />
+          )}
         </div>
 
-        <Carousel className="relative">
-          <CarouselContent className="-ml-2">
-            <CarouselItem className="pl-2 md:basis-1/2 lg:basis-1/3">
-              <div className="h-full rounded-lg border border-border bg-muted/30 p-5">
-                <div className="mb-3 flex items-center gap-2 text-primary">
-                  <IconMic className="h-5 w-5" />
-                  <span className="text-sm font-medium">실시간 전사</span>
-                </div>
-                <p className="mb-4 text-sm text-muted-foreground">브라우저에서 마이크 캡처 후 실시간으로 자막을 확인하세요.</p>
-                <Link href="/sessions/new" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-                  지금 시작하기 <IconChevronRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </CarouselItem>
-            <CarouselItem className="pl-2 md:basis-1/2 lg:basis-1/3">
-              <div className="h-full rounded-lg border border-border bg-muted/30 p-5">
-                <div className="mb-3 flex items-center gap-2 text-chart-2">
-                  <IconSparkles className="h-5 w-5" />
-                  <span className="text-sm font-medium">하이라이트</span>
-                </div>
-                <p className="mb-4 text-sm text-muted-foreground">회의 중 중요한 순간을 표시하고, 요약에 반영하세요.</p>
-                <Link href="/help" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-                  사용법 보기 <IconChevronRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </CarouselItem>
-            <CarouselItem className="pl-2 md:basis-1/2 lg:basis-1/3">
-              <div className="h-full rounded-lg border border-border bg-muted/30 p-5">
-                <div className="mb-3 flex items-center gap-2 text-chart-3">
-                  <IconSparkles className="h-5 w-5" />
-                  <span className="text-sm font-medium">요약 생성</span>
-                </div>
-                <p className="mb-4 text-sm text-muted-foreground">전체 전사본과 하이라이트를 기반으로 간결한 요약을 생성합니다.</p>
-                <Link href="/sessions" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-                  내 세션 보기 <IconChevronRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </CarouselItem>
-            <CarouselItem className="pl-2 md:basis-1/2 lg:basis-1/3">
-              <div className="h-full rounded-lg border border-border bg-muted/30 p-5">
-                <div className="mb-3 flex items-center gap-2 text-destructive">
-                  <IconClock className="h-5 w-5" />
-                  <span className="text-sm font-medium">동의 & 보안</span>
-                </div>
-                <p className="mb-4 text-sm text-muted-foreground">녹음 동의를 생성하고 공유하여 컴플라이언스를 준수하세요.</p>
-                <Link href="/consent/new" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-                  동의 만들기 <IconChevronRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </CarouselItem>
-          </CarouselContent>
-          <CarouselPrevious className="left-0" />
-          <CarouselNext className="right-0" />
-        </Carousel>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-3">
-        <Link href="/sessions" className="rounded-xl border border-border bg-card p-4 shadow-sm transition hover:bg-muted/50">
+        {/* Recent Activity */}
+        <div className="col-span-1 flex flex-col rounded-xl border border-border bg-card p-4 text-card-foreground">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">세션 목록</p>
-              <p className="text-sm text-muted-foreground">모든 회의/강의 세션을 확인하세요</p>
-            </div>
-            <IconChevronRight className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-sm font-medium">최근 활동</h2>
+            <Link href="/settings/usage" className="text-sm text-primary hover:underline">
+              사용량 보기
+            </Link>
           </div>
-        </Link>
-        <Link href="/imports" className="rounded-xl border border-border bg-card p-4 shadow-sm transition hover:bg-muted/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">가져오기 기록</p>
-              <p className="text-sm text-muted-foreground">업로드 이력을 추적합니다</p>
-            </div>
-            <IconChevronRight className="h-5 w-5 text-muted-foreground" />
-          </div>
-        </Link>
-        <Link href="/org/settings" className="rounded-xl border border-border bg-card p-4 shadow-sm transition hover:bg-muted/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">조직 설정</p>
-              <p className="text-sm text-muted-foreground">보존기간·보안 정책을 관리</p>
-            </div>
-            <IconChevronRight className="h-5 w-5 text-muted-foreground" />
-          </div>
-        </Link>
-      </section>
-
-      <section className="rounded-xl border border-border bg-card p-4 shadow-sm">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">관리 & 운영</h2>
-          <Link href="/admin" className="text-sm text-primary hover:underline">관리 콘솔</Link>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Link href="/admin/metrics" className="rounded-lg border border-border p-4 hover:bg-muted/50">
-            <p className="font-medium">지표</p>
-            <p className="text-sm text-muted-foreground">ASR 지연/성공률 등</p>
-          </Link>
-          <Link href="/admin/jobs" className="rounded-lg border border-border p-4 hover:bg-muted/50">
-            <p className="font-medium">백그라운드 작업</p>
-            <p className="text-sm text-muted-foreground">전사/요약 배치 상태</p>
-          </Link>
-          <Link href="/admin/costs" className="rounded-lg border border-border p-4 hover:bg-muted/50">
-            <p className="font-medium">비용 대시보드</p>
-            <p className="text-sm text-muted-foreground">사용량과 비용 추적</p>
-          </Link>
+          <Separator className="my-3" />
+          {loading ? (
+            <ListSkeleton rows={6} />
+          ) : recentEvents && recentEvents.length > 0 ? (
+            <ul className="space-y-3">
+              {recentEvents.map((e) => (
+                <li key={e.id} className="rounded-lg border border-border/60 bg-background p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex h-6 items-center rounded-md bg-secondary px-2 text-xs text-secondary-foreground">
+                        {e.event_type}
+                      </span>
+                      {e.related_document_id && (
+                        <Link
+                          href={`/documents/${e.related_document_id}`}
+                          className="max-w-[160px] truncate text-xs text-primary hover:underline sm:max-w-[220px]"
+                        >
+                          {docTitles[e.related_document_id] || "문서"}
+                        </Link>
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground">{formatDateTime(e.occurred_at)}</span>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    {e.provider && <span>제공자: {e.provider}</span>}
+                    {e.model && <span>모델: {e.model}</span>}
+                    {e.total_cost_usd != null && (
+                      <span className="ml-auto inline-flex items-center rounded bg-muted px-2 py-0.5 text-muted-foreground">
+                        비용 ${typeof e.total_cost_usd === "string" ? parseFloat(e.total_cost_usd).toFixed(4) : (e.total_cost_usd as number).toFixed(4)}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState title="활동 내역이 아직 없어요" description="문서를 업로드하고 요약·퀴즈·대화를 시작해 보세요." />
+          )}
         </div>
       </section>
     </main>
+  );
+}
+
+function StatCard({ title, primary, subtitle, loading }: { title: string; primary?: string; subtitle?: string; loading?: boolean }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-4 text-card-foreground">
+      <p className="text-xs text-muted-foreground">{title}</p>
+      {loading ? (
+        <div className="mt-3 space-y-2">
+          <Skeleton className="h-7 w-20" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+      ) : (
+        <>
+          <p className="mt-2 text-2xl font-semibold">{primary ?? "-"}</p>
+          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+        </>
+      )}
+    </div>
+  );
+}
+
+function QuickAction({ href, label, emoji, description }: { href: string; label: string; emoji: string; description?: string }) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "group flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-card-foreground transition",
+        "hover:bg-accent hover:text-accent-foreground"
+      )}
+    >
+      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-lg">{emoji}</div>
+      <div className="min-w-0">
+        <p className="truncate text-sm font-semibold">{label}</p>
+        {description && <p className="truncate text-xs text-muted-foreground group-hover:text-accent-foreground/80">{description}</p>}
+      </div>
+    </Link>
+  );
+}
+
+function EmptyState({ title, description, ctaHref, ctaLabel }: { title: string; description?: string; ctaHref?: string; ctaLabel?: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-border/60 bg-background p-6 text-center">
+      <p className="font-medium">{title}</p>
+      {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+      {ctaHref && ctaLabel && (
+        <div className="mt-3">
+          <Link href={ctaHref} className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90">
+            {ctaLabel}
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ListSkeleton({ rows = 5 }: { rows?: number }) {
+  return (
+    <ul className="space-y-3">
+      {Array.from({ length: rows }).map((_, i) => (
+        <li key={i} className="flex items-center justify-between rounded-lg border border-border/60 bg-background p-3">
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+          <Skeleton className="h-6 w-12" />
+        </li>
+      ))}
+    </ul>
   );
 }

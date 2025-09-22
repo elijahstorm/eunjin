@@ -2,474 +2,304 @@
 
 /**
  * CODE INSIGHT
- * This code's use case is to provide an authenticated application shell layout for the (app) section.
- * It enforces an auth gate using Supabase Auth on the client, renders a responsive sidebar and topbar,
- * includes an organization switcher (local persistence), realtime connectivity indicators (online/offline & visibility),
- * and primary navigation linking to key app pages like dashboard, sessions, imports, integrations, consent, org, and settings.
+ * This code's use case is the authenticated app sub-layout for poiima, providing a fixed top app header and a persistent left sidebar.
+ * It wraps all authenticated app pages under (app) with responsive, accessible navigation and user actions without adding marketing UI.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/utils/supabase/client-browser";
 import { cn } from "@/utils/utils";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Menu,
-  X,
-  ChevronDown,
-  Wifi,
-  WifiOff,
-  Radio,
-  Home,
-  CalendarClock,
-  PlusCircle,
-  HardDriveUpload,
-  PlugZap,
-  ShieldCheck,
-  Users,
-  Building2,
-  Settings as SettingsIcon,
-  Bell,
-  Laptop,
-  User,
-  LogOut,
-  Gauge,
-  Activity,
-  DollarSign,
-  HelpCircle,
-  FileText,
-} from "lucide-react";
 
-function useOnlineStatus() {
-  const [online, setOnline] = useState<boolean>(typeof navigator !== "undefined" ? navigator.onLine : true);
-  useEffect(() => {
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
+type Props = { children: React.ReactNode };
+
+const NAV_ITEMS: { href: string; label: string; icon: React.ReactNode }[] = [
+  {
+    href: "/dashboard",
+    label: "대시보드",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+        <path d="M3 13h8V3H3v10zM13 21h8V11h-8v10zM13 3v6h8V3h-8zM3 21h8v-6H3v6z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/upload",
+    label: "업로드",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+        <path d="M12 16V4m0 0l-4 4m4-4l4 4" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M20 16.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    href: "/documents",
+    label: "문서",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+        <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+        <path d="M14 3v5h5" />
+      </svg>
+    ),
+  },
+  {
+    href: "/reviews",
+    label: "복습",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+        <path d="M21 12a9 9 0 1 1-2.64-6.36" strokeLinecap="round" />
+        <path d="M22 4l-4 1 1-4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    href: "/quizzes",
+    label: "퀴즈",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+        <path d="M9 9a3 3 0 1 1 5.2 2.1c-.8.77-1.2 1.26-1.2 2.9M12 18h.01" strokeLinecap="round" />
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+      </svg>
+    ),
+  },
+  {
+    href: "/settings",
+    label: "설정",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
+        <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.07a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.07a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 7.02 3.4l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.07c0 .66.39 1.26 1 1.51.57.24 1.22.12 1.69-.33l.06-.06A2 2 0 1 1 20.6 7l-.06.06c-.45.47-.57 1.12-.33 1.69.25.61.85 1 1.51 1H22a2 2 0 1 1 0 4h-.07c-.66 0-1.26.39-1.51 1z" />
+      </svg>
+    ),
+  },
+];
+
+function AppHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) {
+  const router = useRouter();
+  const [email, setEmail] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const supabase = supabaseBrowser;
+    supabase.auth.getUser().then(({ data }) => {
+      setEmail(data.user?.email ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setEmail(session?.user?.email ?? null);
+    });
     return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
+      sub.subscription.unsubscribe();
     };
   }, []);
-  return online;
-}
 
-function useDocumentVisibility() {
-  const [visible, setVisible] = useState<boolean>(typeof document !== "undefined" ? document.visibilityState === "visible" : true);
-  useEffect(() => {
-    const handler = () => setVisible(document.visibilityState === "visible");
-    document.addEventListener("visibilitychange", handler);
-    return () => document.removeEventListener("visibilitychange", handler);
-  }, []);
-  return visible;
-}
+  const initial = React.useMemo(() => (email ? email.charAt(0).toUpperCase() : "P"), [email]);
 
-function useOutsideClick<T extends HTMLElement>(onOutside: () => void) {
-  const ref = useRef<T | null>(null);
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      const el = ref.current;
-      if (!el) return;
-      if (e.target instanceof Node && !el.contains(e.target)) onOutside();
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [onOutside]);
-  return ref;
-}
+  const handleSignOut = async () => {
+    try {
+      await supabaseBrowser.auth.signOut();
+    } finally {
+      router.push("/login");
+    }
+  };
 
-function NavLink({ href, icon: Icon, label, active }: { href: string; icon: React.ComponentType<any>; label: string; active: boolean }) {
   return (
-    <Link
-      href={href}
-      className={cn(
-        "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-        active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
-      )}
-    >
-      <Icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
-      <span>{label}</span>
-    </Link>
+    <header className="fixed inset-x-0 top-0 z-50 h-16 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-auto flex h-full max-w-screen-2xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          aria-label="사이드바 열기"
+          onClick={onToggleSidebar}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        <Link href="/dashboard" className="group flex items-center gap-2.5">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
+            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+              <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" fill="currentColor" opacity="0.9" />
+            </svg>
+          </span>
+          <span className="text-base font-semibold tracking-tight group-hover:opacity-90">poiima</span>
+        </Link>
+
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/upload"
+            className="hidden h-9 items-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
+          >
+            새 업로드
+          </Link>
+
+          <div className="relative">
+            <UserMenu initial={initial} email={email} onSignOut={handleSignOut} />
+          </div>
+        </div>
+      </div>
+    </header>
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <div className="px-3 pt-4 pb-2 text-xs font-medium uppercase text-muted-foreground/70">{children}</div>;
-}
+function UserMenu({ initial, email, onSignOut }: { initial: string; email: string | null; onSignOut: () => void }) {
+  const [open, setOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement | null>(null);
 
-function OrgSwitcher({ onChanged }: { onChanged?: (org: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const [org, setOrg] = useState<string>("Personal");
-  const ref = useOutsideClick<HTMLDivElement>(() => setOpen(false));
-
-  useEffect(() => {
-    const stored = localStorage.getItem("dc_org_name");
-    if (stored) setOrg(stored);
+  React.useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (!menuRef.current) return;
+      if (!menuRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
   }, []);
 
-  const select = useCallback(
-    (name: string) => {
-      setOrg(name);
-      localStorage.setItem("dc_org_name", name);
-      setOpen(false);
-      onChanged?.(name);
-    },
-    [onChanged]
-  );
-
-  const options = [
-    { name: "Personal" },
-    { name: "Team Alpha" },
-    { name: "Lecture Lab" },
-  ];
-
   return (
-    <div className="relative" ref={ref}>
+    <div ref={menuRef} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
         aria-haspopup="menu"
         aria-expanded={open}
+        onClick={() => setOpen((s) => !s)}
+        className="inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border bg-card text-sm font-medium shadow-sm hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <Building2 className="h-4 w-4 text-muted-foreground" />
-        <span className="truncate max-w-[140px]">{org}</span>
-        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        <span aria-hidden className="select-none text-[0.9rem]">{initial}</span>
       </button>
       {open && (
         <div
           role="menu"
-          className="absolute z-50 mt-2 w-56 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg"
+          aria-label="사용자 메뉴"
+          className="absolute right-0 mt-2 w-56 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg"
         >
-          <div className="p-2">
-            {options.map((o) => (
-              <button
-                key={o.name}
-                onClick={() => select(o.name)}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-muted",
-                  o.name === org && "bg-primary/10 text-primary"
-                )}
-              >
-                <Users className="h-4 w-4" />
-                <span className="truncate">{o.name}</span>
-              </button>
-            ))}
+          <div className="px-3 py-2 text-xs text-muted-foreground">
+            <div className="truncate font-medium text-foreground">{email ?? "로그인 계정"}</div>
+            <div className="truncate">인증됨</div>
           </div>
           <Separator />
-          <div className="p-2">
-            <Link href="/org/settings" className="block rounded-sm px-2 py-2 text-sm hover:bg-muted">
-              Organization settings
-            </Link>
+          <div className="py-1 text-sm">
+            <MenuItem href="/settings/account" label="계정" />
+            <MenuItem href="/settings/preferences" label="환경설정" />
+            <MenuItem href="/settings/privacy" label="개인정보" />
+            <MenuItem href="/settings/usage" label="사용량" />
           </div>
+          <Separator />
+          <button
+            type="button"
+            onClick={onSignOut}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+              <path d="M16 17l5-5-5-5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M21 12H9" strokeLinecap="round" />
+              <path d="M14 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" />
+            </svg>
+            로그아웃
+          </button>
         </div>
       )}
     </div>
   );
 }
 
-function ProfileMenu({ email, onSignOut }: { email?: string | null; onSignOut: () => void }) {
-  const [open, setOpen] = useState(false);
-  const ref = useOutsideClick<HTMLDivElement>(() => setOpen(false));
+function MenuItem({ href, label }: { href: string; label: string }) {
   return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-3 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
-        aria-haspopup="menu"
-        aria-expanded={open}
-      >
-        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
-          <User className="h-4 w-4" />
-        </div>
-        <div className="flex flex-col items-start leading-tight">
-          <span className="text-sm font-medium">Account</span>
-          <span className="text-xs text-muted-foreground truncate max-w-[140px]">{email ?? ""}</span>
-        </div>
-        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-      </button>
-      {open && (
-        <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-lg">
-          <div className="p-2 text-sm">
-            <Link href="/me" className="block rounded-sm px-2 py-2 hover:bg-muted">Profile</Link>
-            <Link href="/settings/profile" className="block rounded-sm px-2 py-2 hover:bg-muted">Settings</Link>
-            <Link href="/settings/notifications" className="block rounded-sm px-2 py-2 hover:bg-muted">Notifications</Link>
-            <Link href="/settings/devices" className="block rounded-sm px-2 py-2 hover:bg-muted">Devices</Link>
-            <Separator className="my-2" />
-            <Link href="/admin" className="block rounded-sm px-2 py-2 hover:bg-muted">Admin</Link>
-            <Separator className="my-2" />
-            <button onClick={onSignOut} className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left hover:bg-muted">
-              <LogOut className="h-4 w-4" /> Sign out
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    <Link href={href} className="flex items-center px-3 py-2 hover:bg-accent hover:text-accent-foreground">
+      {label}
+    </Link>
   );
 }
 
-function RealtimeBadge() {
-  const online = useOnlineStatus();
-  const visible = useDocumentVisibility();
-  return (
-    <div className="flex items-center gap-3 text-xs">
-      <div className={cn("flex items-center gap-1 rounded-full px-2 py-1", online ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300")}
-        title={online ? "Online" : "Offline"}
-      >
-        {online ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
-        <span>{online ? "Online" : "Offline"}</span>
-      </div>
-      <div className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-muted-foreground" title={visible ? "Active" : "Background tab"}>
-        <Radio className={cn("h-3.5 w-3.5", visible ? "text-primary" : "text-muted-foreground")} />
-        <span>{visible ? "Live" : "Background"}</span>
-      </div>
-    </div>
-  );
-}
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
+function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
-  const [checking, setChecking] = useState(true);
-  const [email, setEmail] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const online = useOnlineStatus();
 
-  useEffect(() => {
-    let mounted = true;
-    supabaseBrowser.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      const session = data.session;
-      if (!session) {
-        router.replace("/auth/sign-in");
-      } else {
-        setEmail(session.user.email ?? null);
-      }
-      setChecking(false);
-    });
-    const { data: sub } = supabaseBrowser.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        router.replace("/auth/sign-in");
-      } else {
-        setEmail(session.user.email ?? null);
-      }
-    });
-    return () => {
-      mounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, [router]);
-
-  const signOut = useCallback(async () => {
-    await supabaseBrowser.auth.signOut();
-    router.replace("/auth/sign-in");
-  }, [router]);
-
-  const nav = useMemo(
-    () => [
-      {
-        label: "Overview",
-        items: [
-          { href: "/dashboard", label: "Dashboard", icon: Home },
-        ],
-      },
-      {
-        label: "Sessions",
-        items: [
-          { href: "/sessions", label: "All sessions", icon: CalendarClock },
-          { href: "/sessions/new", label: "New session", icon: PlusCircle },
-          { href: "/ingest", label: "Ingest", icon: HardDriveUpload },
-          { href: "/ingest/upload", label: "Upload", icon: HardDriveUpload },
-          { href: "/imports", label: "Imports", icon: HardDriveUpload },
-        ],
-      },
-      {
-        label: "Integrations",
-        items: [
-          { href: "/integrations", label: "All integrations", icon: PlugZap },
-          { href: "/integrations/zoom", label: "Zoom", icon: PlugZap },
-          { href: "/integrations/teams", label: "Microsoft Teams", icon: PlugZap },
-        ],
-      },
-      {
-        label: "Consent",
-        items: [
-          { href: "/consent", label: "Consent", icon: ShieldCheck },
-          { href: "/consent/new", label: "New consent", icon: PlusCircle },
-        ],
-      },
-      {
-        label: "Organization",
-        items: [
-          { href: "/org", label: "Overview", icon: Building2 },
-          { href: "/org/members", label: "Members", icon: Users },
-          { href: "/org/settings", label: "Settings", icon: SettingsIcon },
-          { href: "/org/retention", label: "Retention", icon: Gauge },
-          { href: "/org/security", label: "Security", icon: ShieldCheck },
-        ],
-      },
-      {
-        label: "Settings",
-        items: [
-          { href: "/settings/profile", label: "Profile", icon: User },
-          { href: "/settings/notifications", label: "Notifications", icon: Bell },
-          { href: "/settings/devices", label: "Devices", icon: Laptop },
-        ],
-      },
-      {
-        label: "Admin",
-        items: [
-          { href: "/admin", label: "Admin home", icon: SettingsIcon },
-          { href: "/admin/metrics", label: "Metrics", icon: Activity },
-          { href: "/admin/jobs", label: "Jobs", icon: Gauge },
-          { href: "/admin/costs", label: "Costs", icon: DollarSign },
-        ],
-      },
-    ],
-    []
-  );
-
-  if (checking) {
+  const NavLink = ({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) => {
+    const active = pathname === href || pathname.startsWith(href + "/");
     return (
-      <div className="min-h-screen bg-background">
-        <div className="flex h-14 items-center gap-4 border-b border-border px-4">
-          <Skeleton className="h-8 w-8 rounded-md" />
-          <Skeleton className="h-6 w-32" />
-          <div className="ml-auto flex items-center gap-2">
-            <Skeleton className="h-8 w-40" />
-            <Skeleton className="h-9 w-52" />
-            <Skeleton className="h-9 w-44" />
-          </div>
-        </div>
-        <div className="flex">
-          <div className="hidden md:block w-64 border-r border-border p-4">
-            <Skeleton className="h-8 w-40" />
-            <div className="mt-4 space-y-2">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <Skeleton key={i} className="h-9 w-full" />
-              ))}
-            </div>
-          </div>
-          <div className="flex-1 p-6">
-            <Skeleton className="h-10 w-1/3" />
-            <div className="mt-6 space-y-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <Link
+        href={href}
+        onClick={onClose}
+        className={cn(
+          "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+          active ? "bg-accent text-accent-foreground" : "text-foreground hover:bg-accent hover:text-accent-foreground"
+        )}
+        aria-current={active ? "page" : undefined}
+      >
+        <span className={cn("text-muted-foreground group-hover:text-accent-foreground", active && "text-accent-foreground")}>{icon}</span>
+        <span className="truncate">{label}</span>
+      </Link>
     );
-  }
+  };
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="fixed top-16 z-40 hidden h-[calc(100vh-4rem)] w-64 flex-col border-r border-border bg-sidebar px-3 py-4 md:flex">
+        <nav className="flex-1 space-y-1">
+          {NAV_ITEMS.map((item) => (
+            <NavLink key={item.href} {...item} />
+          ))}
+        </nav>
+        <div className="mt-auto">
+          <Separator className="my-3" />
+          <div className="px-2 text-xs text-muted-foreground">v1.0.0</div>
+        </div>
+      </aside>
+
+      {/* Mobile Sidebar Overlay */}
+      {open && (
+        <div className="md:hidden">
+          <div
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px]"
+            onClick={onClose}
+            aria-hidden="true"
+          />
+          <aside
+            className="fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-80 border-r border-border bg-sidebar px-3 py-4 shadow-xl"
+            role="dialog"
+            aria-modal="true"
+          >
+            <nav className="space-y-1">
+              {NAV_ITEMS.map((item) => (
+                <NavLink key={item.href} {...item} />
+              ))}
+            </nav>
+          </aside>
+        </div>
+      )}
+    </>
+  );
+}
+
+export default function AppLayout({ children }: Props) {
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-14 items-center gap-3 px-3 md:px-4">
-          <button
-            onClick={() => setSidebarOpen((v) => !v)}
-            className="inline-flex items-center justify-center rounded-md border border-input p-2 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring md:hidden"
-            aria-label="Toggle navigation"
-          >
-            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-          <Link href="/dashboard" className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <FileText className="h-4 w-4" />
-            </div>
-            <span className="hidden text-sm font-semibold sm:inline">Realtime Summaries</span>
-          </Link>
-          <Separator orientation="vertical" className="mx-2 hidden h-6 md:block" />
-          <div className="hidden items-center gap-2 md:flex">
-            <OrgSwitcher />
-          </div>
-          <div className="ml-auto flex items-center gap-3">
-            <RealtimeBadge />
-            <div className="hidden items-center gap-2 md:flex">
-              <Link href="/help" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-2 rounded-md px-2 py-2 hover:bg-muted">
-                <HelpCircle className="h-4 w-4" /> Help
-              </Link>
-              <Link href="/legal/privacy" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-2 rounded-md px-2 py-2 hover:bg-muted">
-                Privacy
-              </Link>
-              <Link href="/legal/terms" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-2 rounded-md px-2 py-2 hover:bg-muted">
-                Terms
-              </Link>
-            </div>
-            <ProfileMenu email={email} onSignOut={signOut} />
-          </div>
+      <a
+        href="#poiima-app-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
+      >
+        콘텐츠로 건너뛰기
+      </a>
+
+      <AppHeader onToggleSidebar={() => setSidebarOpen(true)} />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      <main id="poiima-app-content" className="pt-16 md:pl-64">
+        <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-8">
+          {children}
         </div>
-        {!online && (
-          <div className="border-t border-border bg-amber-50 text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">
-            <div className="mx-auto max-w-screen-2xl px-4">
-              <Alert className="border-0 bg-transparent p-2">
-                <AlertTitle className="text-xs font-medium">You are offline</AlertTitle>
-                <AlertDescription className="text-xs">Changes will sync automatically when you reconnect.</AlertDescription>
-              </Alert>
-            </div>
-          </div>
-        )}
-      </header>
-
-      <div className="flex">
-        <aside
-          className={cn(
-            "fixed inset-y-14 z-30 w-72 shrink-0 border-r border-border bg-sidebar text-sidebar-foreground transition-transform duration-200 md:static md:translate-x-0",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-          )}
-        >
-          <nav className="h-full overflow-y-auto pb-6">
-            <div className="p-4">
-              {nav.map((section) => (
-                <div key={section.label}>
-                  <SectionLabel>{section.label}</SectionLabel>
-                  <div className="space-y-1">
-                    {section.items.map((item) => (
-                      <NavLink key={item.href} href={item.href} icon={item.icon} label={item.label} active={pathname === item.href} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <SectionLabel>More</SectionLabel>
-              <div className="space-y-1">
-                <NavLink href="/integrations/zoom/linked" icon={PlugZap} label="Zoom linked" active={pathname === "/integrations/zoom/linked"} />
-                <NavLink href="/integrations/teams/linked" icon={PlugZap} label="Teams linked" active={pathname === "/integrations/teams/linked"} />
-                <NavLink href="/offline" icon={WifiOff} label="Offline" active={pathname === "/offline"} />
-              </div>
-            </div>
-          </nav>
-        </aside>
-
-        <main id="main" className="flex-1 md:ml-0 md:pl-0 ml-0 pl-0">
-          <div className="mx-auto max-w-screen-2xl p-4 md:p-6">
-            {children}
-          </div>
-          <footer className="border-t border-border bg-background/50">
-            <div className="mx-auto flex max-w-screen-2xl flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-muted-foreground md:flex-row">
-              <div className="flex items-center gap-2">
-                <span>© {new Date().getFullYear()} Realtime Summaries</span>
-                <span className="hidden md:inline">•</span>
-                <Link className="hover:text-foreground" href="/help">Help</Link>
-                <span className="hidden md:inline">•</span>
-                <Link className="hover:text-foreground" href="/legal/privacy">Privacy</Link>
-                <span className="hidden md:inline">•</span>
-                <Link className="hover:text-foreground" href="/legal/terms">Terms</Link>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1"><Activity className="h-4 w-4" /> Status</span>
-                <Link className="hover:text-foreground" href="/integrations">Integrations</Link>
-                <Link className="hover:text-foreground" href="/consent">Consent</Link>
-              </div>
-            </div>
-          </footer>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }
